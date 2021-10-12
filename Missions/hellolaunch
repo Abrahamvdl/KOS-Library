@@ -1,0 +1,7 @@
+clearscreen.
+
+print "Counting Down".
+from {local countdown is 5.} until countdown = 0 STEP {Set countdown to countdown - 1.} DO{
+   Print "..." + countdown.
+   wait 1.
+}
