@@ -3,20 +3,31 @@ wait 1.
 
 set canStart to false.
 
+function build_command_filename {
+  parameter mission.
+  parameter file.
+  return "0:/Missions/" + mission + "/" + file.
+}
+
+function core_has_tagname {
+  return core:part:tag <> "".
+}
+
+function mission_file_location {
+  parameter file.
+  if not core_has_tagname() set core:tag to core:part:uid.
+  return build_command_filename(core:tag, file).
+}
+
 print "Copying Startup file". 
-if EXISTS("0:/activeMission/startup.ks") {
-  copypath("0:/activeMission/startup.ks","").
-  movepath("0:/activeMission/startup.ks", "0:/activeMissionCompletedSteps/" + TIME:SECONDS + "_startup.ks").
+set missionFile to mission_file_location("startup.ks").
+if EXISTS(missionFile) {
+  copypath(missionFile,"").
+  movepath(missionFile, mission_file_location(TIME:SECONDS + "_startup.ks")).
   set canStart to true.  
 } else {
   print "Startup not yet available".
   print " ".
-}
-
-print "Copying Utilities".
-if EXISTS("0:/library/utils.ks") {
-	copypath("0:/library/utils.ks","1:/utils.ks").
-	runpath("utils.ks").
 }
 
 print "Copying the main boot File".

@@ -1,3 +1,5 @@
+print "Activating Utilities".
+
 function Require{
 	parameter filename.
 	
