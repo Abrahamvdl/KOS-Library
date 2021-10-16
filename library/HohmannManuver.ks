@@ -27,14 +27,6 @@
 //dv1 = sqr(mu/r1) * (sqr(2*r2/(r1+r2)) - 1) <-- this is the greater of the two 
 //dv2 = sqr(mu/r2) * (1 - sqr(2*r1/(r1+r2))) <-- the circularization burn.
 
-//Maps (-180,180) to (0,360)
-function LNG_TO_DEGREES {
-  parameter lng.
-
-  RETURN MOD(lng + 360, 360).
-}
-
-
 function PerformManuver {
 	PARAMETER FlyToLongitude.
 	PARAMETER SteeringDirection.
@@ -46,11 +38,10 @@ function PerformManuver {
 	//Our fly to point should be on the oposite side of the point we are aiming at.
 
 	clearscreen.
-	Print "Flying to target Longitude of: " + FlyToLongitude.		
-	lock shipAbsOrbitPos to SHIP:ORBIT:LAN + SHIP:ORBIT:ARGUMENTOFPERIAPSIS + SHIP:ORBIT:TRUEANOMALY.
+	Print "Current Angle Difference: " + FlyToLongitude.			
 	
-	until abs(LNG_TO_DEGREES(FlyToLongitude) - LNG_TO_DEGREES(shipAbsOrbitPos)) < 1{//within 1 degree
-		print "Current longitude: " + LNG_TO_DEGREES(shipAbsOrbitPos) at (0,1).		
+	until abs(FlyToLongitude < 1{//within 1 degree
+		Print "Current Angle Difference: " + FlyToLongitude at (0,1).		
 		wait 0.1.
 	}
 	
@@ -120,77 +111,94 @@ Function HohmannManuver {
 	//340 - 310 = 30
 	//310 - 340 = -30
 	
-	set inclinationTarget to newOrbit:Inclination - ourOrbit:Inclination.
+	lock inclinationTarget to newOrbit:Inclination - ourOrbit:Inclination.
 	
-	if inclinationTarget > 180 {
-		set inclinationTarget to 360 - inclinationTarget.
-	}
-	if inclinationTarget < -180 {
-		set inclinationTarget to 360 + inclinationTarget.
-	}
+	if abs(inclinationTarget) > 1 {
+		print ("Inclination Adjustment Required").
 	
-	if inclinationTarget > 90 or inclinationTarget < -90 {
-		print "ERROR: Target orbit is too inclined to reach".
-		abort.
-	}
-	
-	//At this point we know that the inclinationTarget is acceptable, 
-	//so we want to travel to the longitude of assension 
-	//(or the desension if it is closer)
+		if inclinationTarget > 180 {
+			set inclinationTarget to 360 - inclinationTarget.
+		}
+		if inclinationTarget < -180 {
+			set inclinationTarget to 360 + inclinationTarget.
+		}
 		
-	set targetLong to newOrbit:LAN. //start by assuming the LAN is ahead of us and we aim for it.
+		if inclinationTarget > 90 or inclinationTarget < -90 {
+			print "ERROR: Target orbit is too inclined to reach".
+			abort.
+		}
 		
-	if (newOrbit:LAN - SHIP:GEOPOSITION:LNG) < 0 { // the LAN is behind us, and thus we aim for the longitude of Desension instead.
-		set targetLong to MOD(targetLong + 180, 360).
-	}
+		//At this point we know that the inclinationTarget is acceptable, 
+		//so we want to travel to the longitude of assension of our orbit
+		//(or the desension if it is closer)
+		//We know the LAN in abosulute terms, but when the sum of True Anomaly and 
+		//Argument of PERIAPSIS is 0 then we know we are at LAN by definition
+			
+		print ("Waiting until we are at the Longitude of Ascension/Desension.").
+		
+		lock targetLong to SHIP:ORBIT:ARGUMENTOFPERIAPSIS + SHIP:ORBIT:TRUEANOMALY. //start by assuming the LAN is ahead of us and we aim for it.
+			
+		if targetLong > 180 { // the LAN is behind us, and thus we aim for the longitude of Desension instead.
+			lock targetLong to MOD(SHIP:ORBIT:ARGUMENTOFPERIAPSIS + SHIP:ORBIT:TRUEANOMALY + 180, 360).
+		}
+		
+		wait until targetLong < 1. //fly until the difference is less than 1 degree.
+		
+		if inclinationTarget > 0 {	
+			lock steering to SHIP:UP.
+		}else{
+			lock steering to SHIP:UP:INVERSE. //down.
+		}
+		
+		//now we have to burn until the inclination matches.
+		set throttleSetting to 0.
+		lock throttle to throttleSetting.
+		
+		until ABS(inclinationTarget) < 0.2 {
+			set throttleSetting to ABS(inclinationTarget) / 90 * 0.5. //max 0.5 throttle, but will slow down as we reach the target value.
+		}
+		
+		lock throttle to 0.
+		print "Inclination target Achieved".
 	
-	wait until SHIP:GEOPOSITION:LNG - targetLong < 1. //fly until the difference is less than 1 degree.
-	
-	if inclinationTarget > 0 {	
-		lock steering to SHIP:UP.
 	}else{
-		lock steering to SHIP:UP:INVERSE. //down.
+		Print "No Inclination Adjustment Required".
 	}
 	
-	//now we have to burn until the inclination matches.
-	set throttleSetting to 0.
-	lock throttle to throttleSetting.
-	
-	until ABS(newOrbit:Inclination - ourOrbit:Inclination) < 0.2 {
-		set throttleSetting to ABS(newOrbit:Inclination - ourOrbit:Inclination) / 90 * 0.5. //max 0.5 throttle, but will slow down as we reach the target value.
-	}
-	
-	lock throttle to 0.
+	wait 2.
 	
 	//At this point our inclination should match (or very close).
 	//Thus we now start the standard Hohmann Manuver
 	//We are going to work with the asumption that the 2 orbits do not intersect currently. 
 	//Now we need to determine which orbit is inside and which is outside.
+	Print "Starting Classic Hohmann Manuver".
+	wait 5.
 	
 	set raiseOrbit to newOrbit:APOAPSIS - SHIP:ORBIT:APOAPSIS > 0.
 	
 	if raiseOrbit {
-		//position the target Orbit's periapsis, which is the Longitude of Assension + the Agrument of PERIAPSIS.
-		set TargetLongitude to mod(newOrbit:LAN + newOrbit:ARGUMENTOFPERIAPSIS, 360). 
+		//our target position expressed as an angle between our angle and the angle of the hypothetical object in the new orbit.
+		lock TargetLongitude to VANG(SHIP:ORBIT:POSITION, newOrbit:POSITION).
 		lock SteeringDirection to PROGRADE.
 		lock OurAltitude to SHIP:APOAPSIS. //we are raising our apoapsis.
 		
 		PerformManuver(TargetLongitude, SteeringDirection, OurAltitude, newOrbit:APOAPSIS).
 		
 		//position of the target Orbit's apoapsis
-		set TargetLongitude to mod(newOrbit:LAN + newOrbit:ARGUMENTOFPERIAPSIS + 180, 360).
+		lock TargetLongitude to mod(SHIP:ORBIT:TRUEANOMALY + 180, 360).
 		lock SteeringDirection to PROGRADE.
 		lock OurAltitude to SHIP:PERIAPSIS.
 		
 		PerformManuver(TargetLongitude, SteeringDirection, OurAltitude, newOrbit:PERIAPSIS).		
 	} else {
-		set TargetLongitude to mod(newOrbit:LAN + newOrbit:ARGUMENTOFPERIAPSIS + 180, 360).
+		//target 180 degrees
+		lock TargetLongitude to mod(VANG(SHIP:ORBIT:POSITION, newOrbit:POSITION) + 180, 360).
 		lock SteeringDirection to PROGRADE.
 		lock OurAltitude to SHIP:PERIAPSIS.
 		
 		PerformManuver(TargetLongitude, SteeringDirection, OurAltitude, newOrbit:PERIAPSIS).		
 		
-		set TargetLongitude to mod(newOrbit:LAN + newOrbit:ARGUMENTOFPERIAPSIS, 360). 
+		lock TargetLongitude to SHIP:ORBIT:TRUEANOMALY. //target 0 degrees
 		lock SteeringDirection to PROGRADE.
 		lock OurAltitude to SHIP:APOAPSIS. //we are raising our apoapsis.
 		
