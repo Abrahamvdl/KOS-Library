@@ -39,8 +39,7 @@ function PerformManuver {
 	PARAMETER FlyToLongitude.
 	PARAMETER SteeringDirection.
 	PARAMETER OurAltitude.
-	PARAMETER TargetAltitude.	
-	PARAMETER TargetOrbitNodeETA.
+	PARAMETER TargetAltitude.		
 	
 	lock THROTTLE to 0.
 	
@@ -48,10 +47,10 @@ function PerformManuver {
 
 	clearscreen.
 	Print "Flying to target Longitude of: " + FlyToLongitude.		
+	lock shipAbsOrbitPos to SHIP:ORBIT:LAN + SHIP:ORBIT:ARGUMENTOFPERIAPSIS + SHIP:ORBIT:TRUEANOMALY.
 	
-	until abs(LNG_TO_DEGREES(FlyToLongitude) - LNG_TO_DEGREES(SHIP:GEOPOSITION:LNG)) < 1{//within 1 degree
-		print "Current longitude: " + LNG_TO_DEGREES(SHIP:GEOPOSITION:LNG) at (0,1).
-		print "ETA to target Orbit's Node: " + TargetOrbitNodeETA at (0,2).
+	until abs(LNG_TO_DEGREES(FlyToLongitude) - LNG_TO_DEGREES(shipAbsOrbitPos)) < 1{//within 1 degree
+		print "Current longitude: " + LNG_TO_DEGREES(shipAbsOrbitPos) at (0,1).		
 		wait 0.1.
 	}
 	
@@ -175,27 +174,27 @@ Function HohmannManuver {
 		set TargetLongitude to mod(newOrbit:LAN + newOrbit:ARGUMENTOFPERIAPSIS, 360). 
 		lock SteeringDirection to PROGRADE.
 		lock OurAltitude to SHIP:APOAPSIS. //we are raising our apoapsis.
-		lock TargetOrbitETA to newOrbit:ETA:PERIAPSIS.
-		PerformManuver(TargetLongitude, SteeringDirection, OurAltitude, newOrbit:APOAPSIS, TargetOrbitETA).
+		
+		PerformManuver(TargetLongitude, SteeringDirection, OurAltitude, newOrbit:APOAPSIS).
 		
 		//position of the target Orbit's apoapsis
 		set TargetLongitude to mod(newOrbit:LAN + newOrbit:ARGUMENTOFPERIAPSIS + 180, 360).
 		lock SteeringDirection to PROGRADE.
 		lock OurAltitude to SHIP:PERIAPSIS.
-		lock TargetOrbitETA to newOrbit:ETA:APOAPSIS.
-		PerformManuver(TargetLongitude, SteeringDirection, OurAltitude, newOrbit:PERIAPSIS, TargetOrbitETA).		
+		
+		PerformManuver(TargetLongitude, SteeringDirection, OurAltitude, newOrbit:PERIAPSIS).		
 	} else {
 		set TargetLongitude to mod(newOrbit:LAN + newOrbit:ARGUMENTOFPERIAPSIS + 180, 360).
 		lock SteeringDirection to PROGRADE.
 		lock OurAltitude to SHIP:PERIAPSIS.
-		lock TargetOrbitETA to newOrbit:ETA:PERIAPSIS.
-		PerformManuver(TargetLongitude, SteeringDirection, OurAltitude, newOrbit:PERIAPSIS, TargetOrbitETA).		
+		
+		PerformManuver(TargetLongitude, SteeringDirection, OurAltitude, newOrbit:PERIAPSIS).		
 		
 		set TargetLongitude to mod(newOrbit:LAN + newOrbit:ARGUMENTOFPERIAPSIS, 360). 
 		lock SteeringDirection to PROGRADE.
 		lock OurAltitude to SHIP:APOAPSIS. //we are raising our apoapsis.
-		lock TargetOrbitETA to newOrbit:ETA:APOAPSIS.
-		PerformManuver(TargetLongitude, SteeringDirection, OurAltitude, newOrbit:APOAPSIS, TargetOrbitETA).
+		
+		PerformManuver(TargetLongitude, SteeringDirection, OurAltitude, newOrbit:APOAPSIS).
 	}
 	
 	Print "Final Orbit achieved.".
