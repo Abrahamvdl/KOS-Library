@@ -30,7 +30,24 @@ set HasMaxDist to false.
 
 SET myOrbit TO CREATEORBIT(inc, ecen, semiMajor, longOfAscen, arguOfPeri, 0, 0, Kerbin).
 	until true = false {
-		clearscreen.		
+		clearscreen.
+		
+		print "Info Start".
+		
+		print "TARGET ORBIT:Position: " + myOrbit:Position.
+		print "TARGET ORBIT:True Anomaly: " + myOrbit:TrueAnomaly.
+		print "TARGET ORBIT:Mean Anomaly at EPOCH: " + myOrbit:MEANANOMALYATEPOCH.
+		print "TARGET ORBIT:EPOCH: " + myOrbit:EPOCH.
+		print "TARGET ORBIT:Velocity: " + myOrbit:VELOCITY.
+		
+		print " ".
+		print "Our Orbit info.".
+		print "Inclination: " + ship:orbit:Inclination.
+		print "LAN: " + ship:orbit:LAN.
+		print "ArgumentOfPeriapsis: " + ship:orbit:ArgumentOfPeriapsis.
+		print "True Anomaly: " + ship:orbit:TrueAnomaly.
+		
+		print "".
 		
 		set angle to AngleForIntersection(SHIP:ORBIT,myOrbit).
 		
@@ -45,28 +62,22 @@ SET myOrbit TO CREATEORBIT(inc, ecen, semiMajor, longOfAscen, arguOfPeri, 0, 0, 
 		
 		set AnglePos to VANG(ship:position, myOrbit:position).
 		print "Angle Diff: " + AnglePos.
-	
-		set kuniverse:timewarp:mode to "RAILS".
-		if myOrbit:ETA:Periapsis < 1 and not PosSet {
+		
+		if myOrbit:ETA:Periapsis < 1  {
 			set TargetPos to myOrbit:POSITION:VEC.
-			set maxDistance to (SHIP:POSITION - TargetPos):MAG + 10.
+			set maxDistance to (SHIP:POSITION - TargetPos):SQRMAGNITUDE + 10.
 			set PosSet to true.
-			kuniverse:timewarp:cancelwarp().
-		} else if not PosSet {
-			set kuniverse:timewarp:rate to myOrbit:ETA:Periapsis/2.
 		}
 		
 		if PosSet {
-			set currentDistance to (SHIP:OBT:POSITION - TargetPos):MAG.
+			set currentDistance to (SHIP:POSITION - TargetPos):MAG.
 			print "Current Distance: " + currentDistance.
 			print "Target Pos: " + TargetPos.
-			print "SHIP Pos: " + SHIP:OBT:POSITION.
-			print "Has Max Dist: " + hasMaxDist.
 			
 			if currentDistance > maxDistance and not HasMaxDist {
 				set maxDistance to currentDistance.
 			} else {
-				PRint "Max Dist".
+				PRint "HERE IS THE Max Distance".
 				set HasMaxDist to true.
 				set minDistance to maxDistance.
 			}
@@ -74,7 +85,7 @@ SET myOrbit TO CREATEORBIT(inc, ecen, semiMajor, longOfAscen, arguOfPeri, 0, 0, 
 			if HasMaxDist and currentDistance < minDistance{
 				set mimDistance to currentDistance.
 			}else {
-				PRint "Min Dist".				
+				PRint "HERE IS THE MIM Distance".				
 			}			
 		}		
 		

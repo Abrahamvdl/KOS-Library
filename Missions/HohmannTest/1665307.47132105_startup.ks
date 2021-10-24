@@ -47,32 +47,32 @@ SET myOrbit TO CREATEORBIT(inc, ecen, semiMajor, longOfAscen, arguOfPeri, 0, 0, 
 		print "Angle Diff: " + AnglePos.
 	
 		set kuniverse:timewarp:mode to "RAILS".
-		if myOrbit:ETA:Periapsis < 1 and not PosSet {
+		if myOrbit:ETA:Periapsis < 1  {
 			set TargetPos to myOrbit:POSITION:VEC.
 			set maxDistance to (SHIP:POSITION - TargetPos):MAG + 10.
 			set PosSet to true.
 			kuniverse:timewarp:cancelwarp().
-		} else if not PosSet {
+		} else {
 			set kuniverse:timewarp:rate to myOrbit:ETA:Periapsis/2.
 		}
 		
 		if PosSet {
-			set currentDistance to (SHIP:OBT:POSITION - TargetPos):MAG.
-			print "Current Distance: " + currentDistance.
+			set currentDistance to SHIP:POSITION - TargetPos.
+			print "Current Distance: " + currentDistance:MAG.
 			print "Target Pos: " + TargetPos.
-			print "SHIP Pos: " + SHIP:OBT:POSITION.
+			print "SHIP Pos: " + SHIP:POSITION.
 			print "Has Max Dist: " + hasMaxDist.
 			
-			if currentDistance > maxDistance and not HasMaxDist {
-				set maxDistance to currentDistance.
+			if currentDistance:MAG > maxDistance and not HasMaxDist {
+				set maxDistance to currentDistance:MAG.
 			} else {
 				PRint "Max Dist".
 				set HasMaxDist to true.
 				set minDistance to maxDistance.
 			}
 			
-			if HasMaxDist and currentDistance < minDistance{
-				set mimDistance to currentDistance.
+			if HasMaxDist and currentDistance:MAG < minDistance{
+				set mimDistance to currentDistance:MAG.
 			}else {
 				PRint "Min Dist".				
 			}			

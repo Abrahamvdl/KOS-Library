@@ -29,7 +29,7 @@ set minDistance to 0.
 set HasMaxDist to false.
 
 SET myOrbit TO CREATEORBIT(inc, ecen, semiMajor, longOfAscen, arguOfPeri, 0, 0, Kerbin).
-	until true = false {
+	until true <> false {
 		clearscreen.		
 		
 		set angle to AngleForIntersection(SHIP:ORBIT,myOrbit).
@@ -84,4 +84,4 @@ SET myOrbit TO CREATEORBIT(inc, ecen, semiMajor, longOfAscen, arguOfPeri, 0, 0, 
 		wait 1.
 	}
 
-//OrbitalAllignmentWithOrbit(myOrbit).
+OrbitalAllignmentWithOrbit(myOrbit).

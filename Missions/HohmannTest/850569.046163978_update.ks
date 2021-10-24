@@ -1,5 +1,6 @@
 //Replace Boot Script
 
+deletepath("HM.ks").
 deletepath("HM2.ks").
 deletepath("startup.ks").
 

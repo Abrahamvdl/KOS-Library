@@ -47,12 +47,12 @@ SET myOrbit TO CREATEORBIT(inc, ecen, semiMajor, longOfAscen, arguOfPeri, 0, 0, 
 		print "Angle Diff: " + AnglePos.
 	
 		set kuniverse:timewarp:mode to "RAILS".
-		if myOrbit:ETA:Periapsis < 1 and not PosSet {
+		if myOrbit:ETA:Periapsis < 1  {
 			set TargetPos to myOrbit:POSITION:VEC.
 			set maxDistance to (SHIP:POSITION - TargetPos):MAG + 10.
 			set PosSet to true.
 			kuniverse:timewarp:cancelwarp().
-		} else if not PosSet {
+		} else {
 			set kuniverse:timewarp:rate to myOrbit:ETA:Periapsis/2.
 		}
 		
