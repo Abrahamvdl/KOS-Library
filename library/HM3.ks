@@ -61,19 +61,11 @@ function InclinationAdjuster {
 }
 
 function SingleManuver{
-	parameter TargetPositionCondition. 
-	parameter TargetSteeringDirection. 
-	parameter TargetBurnCondition. 
-	
-	parameter TargetPositionIndicator is {return "NONE".}.
-	parameter TargetBurnIndicator is {return "NONE".}.
-	parameter TimeWarpRate is {return 1.}.
+	parameter TargetPositionCondition, TargetSteeringDirection, TargetBurnCondition, TargetPositionIndicator, TargetBurnIndicator, TimeWarpRate.
 	
 	set kuniverse:timewarp:mode to "RAILS".
-	until TargetPositionCondition() {
-		if TargetPositionIndicator() <> "NONE" {
-			print "Position Approach Diff: " + TargetPositionIndicator() at (0,0).
-		}
+	until TargetPositionCondition() {		
+		print "Position Approach Diff: " + TargetPositionIndicator() at (0,0).		
 		set kuniverse:timewarp:rate to TimeWarpRate().
 		wait 0.1.
 	}
@@ -91,10 +83,8 @@ function SingleManuver{
 	set failureCond to 0.	
 	
 	until TargetBurnCondition() < 0.01 {
-		set throttleSetting to min(TargetBurnCondition(), 1). 
-		if TargetBurnIndicator() <> "NONE" {
-			print "Current Target Diff: " + TargetBurnIndicator() at (0,0).
-		}
+		set throttleSetting to min(TargetBurnCondition(), 1). 		
+		print "Current Target Diff: " + TargetBurnIndicator() at (0,0).		
 		
 		wait 0.2.
 		
@@ -120,43 +110,92 @@ function SingleManuver{
 function OrbitalAllignmentWithOrbit{
 	parameter TargetOrbit.
 	
-	set ourOrbit to SHIP:ORBIT.		
+	set orbitalAngleToP to 0.
+	set orbitalAngleToA to 0.
+	
+	set assignP to {parameter inVal. set orbitalAngleToP to inVal.}.
+	set assignA to {parameter inVal. set orbitalAngleToA to inVal.}.
+	
+	set hasFoundTarget to false.
+	set timeToDestination to { return -1.}.
+	
+	if (TargetOrbit:ETA:PERIAPSIS < TargetOrbit:ETA:APOAPSIS) {
+		set timeToDestination to {return TargetOrbit:ETA:PERIAPSIS.}.
+		when TargetOrbit:ETA:PERIAPSIS < 1 then {
+			assignP(mod(SHIP:OBT:TRUEANOMALY + vang(TargetOrbit:POSITION - BODY:position, ship:position - BODY:position),360)).			
+			assignA(mod(orbitalAngleToP + 180, 360)).
+			set hasFoundTarget to true.
+		}
+	} else {
+		set timeToDestination to {return TargetOrbit:ETA:APOAPSIS.}.
+		when TargetOrbit:ETA:APOAPSIS < 1 then {
+			assignA(mod(SHIP:OBT:TRUEANOMALY + vang(TargetOrbit:POSITION - BODY:position, ship:position - BODY:position),360)).
+			assignP(mod(orbitalAngleToA + 180, 360)).
+			set hasFoundTarget to true.			
+		}
+	}
+	
 	print "Starting Orbit Adjustment - Target Orbit".
 	
 	if InclinationAdjuster(TargetOrbit) > 0 {
-		"Target Orbit unreachable, aborting procedure.".
+		print "Target Orbit unreachable, aborting procedure.".
 		abort.
-	}	
+	}		
 	
-	set IsRaising to (ourOrbit:SEMIMAJORAXIS - TargetOrbit:SEMIMAJORAXIS) < 0.
+	set kuniverse:timewarp:mode to "RAILS".
+	if not hasFoundTarget {
+		print "Waiting until target Orbit PERIAPSIS/APOAPSIS angle is found".
+		until timeToDestination() < 2 {
+			print "Time remaining: " + timeToDestination() at (0,0).			
+			set vd TO VECDRAW(Kerbin:position, TargetOrbit:POSITION - Kerbin:position, RGB(1,0,0), "Arrow 1", 1.0, TRUE, 0.2, TRUE,	TRUE ).				
+			set kuniverse:timewarp:rate to timeToDestination()/2.			
+			wait 0.1.
+			CLEARVECDRAWS().
+		}		
+	}
+	kuniverse:timewarp:cancelwarp().	
+	
+	print "Inclination is set and we know the target angle".
+	print "Target True Anomaly: " + orbitalAngleToP.
+	
+	//wait 10.
+	print "Starting the Hohmann Manuver.".
+	
+	set IsRaising to (SHIP:ORBIT:SEMIMAJORAXIS - TargetOrbit:SEMIMAJORAXIS) < 0.
 			
 	set TargetPositionCondition to {return false. }.
 	set TargetSteeringDirection to {return false. }.
 	set TargetBurnCondition to {return false. }.
 	set TargetPositionIndicator to {return false. }.
 	set TargetBurnIndicator to { return SHIP:OBT:Apoapsis - SHIP:OBT:PERIAPSIS. }.
-	set TimeWarpRate to {return false. }.		
+	set TimeWarpRate to {return false. }.
+
+	function angleDistance{parameter targetAngle, currentAngle.	if targetAngle > currentAngle {return targetAngle-currentAngle.}else{return 360-currentAngle+targetAngle.}	}
 	
 	if IsRaising {
-		set TargetPositionCondition to { return ETA:PERIAPSIS < 30. }.
+		set TargetPositionCondition to { return angleDistance(orbitalAngleToP,ship:OBT:TRUEANOMALY) < 3. }.
 		set TargetSteeringDirection to { return PROGRADE:FOREVECTOR. }.
 		set TargetBurnCondition to { 
-			set burnVal to 1 - (SHIP:OBT:APOAPSIS / (TargetOrbit:PERIAPSIS * 1.01)).
+			set burnVal to 1 - (SHIP:OBT:APOAPSIS / (TargetOrbit:APOAPSIS * 1.01)).
 			if burnVal > 0.1 return 1.
 			else return burnVal.
 		}.
-		set TargetPositionIndicator to { return ETA:PERIAPSIS. }.			
-		set TimeWarpRate to { return ETA:PERIAPSIS/ 4. }.
+		set TargetPositionIndicator to { return angleDistance(orbitalAngleToP,ship:OBT:TRUEANOMALY). }.			
+		set TimeWarpRate to { 
+			return angleDistance(orbitalAngleToA,ship:OBT:TRUEANOMALY)/2.			
+		}.
 	} else {
-		set TargetPositionCondition to { return ETA:APOAPSIS < 30. }.
+		set TargetPositionCondition to { return angleDistance(orbitalAngleToA,ship:OBT:TRUEANOMALY) < 3. }.
 		set TargetSteeringDirection to { return RETROGRADE:FOREVECTOR. }.
 		set TargetBurnCondition to { 
-			set burnVal to 1 - (SHIP:OBT:PERIAPSIS / (TargetOrbit:APOAPSIS * 0.99)). 
+			set burnVal to 1 - (SHIP:OBT:PERIAPSIS / (TargetOrbit:PERIAPSIS * 0.99)). 
 			if burnVal > 0.1 return 1.
 			else return burnVal.
 		}.
-		set TargetPositionIndicator to { return ETA:APOAPSIS. }.			
-		set TimeWarpRate to { return ETA:APOAPSIS/ 4. }.
+		set TargetPositionIndicator to { return angleDistance(orbitalAngleToA,ship:OBT:TRUEANOMALY). }.			
+		set TimeWarpRate to { 
+			return angleDistance(orbitalAngleToP,ship:OBT:TRUEANOMALY)/2.
+		}.
 	}
 	
 	SingleManuver (	TargetPositionCondition, 
@@ -200,5 +239,3 @@ function OrbitalAllignmentWithOrbit{
 	
 	Print "Final Orbit achieved.".
 }
-
-//THis program is incomplete, but I am abandoning it for now in favour for a shortcut.
