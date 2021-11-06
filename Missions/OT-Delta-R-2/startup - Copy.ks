@@ -25,6 +25,12 @@ FROM {local countdown is 5.} UNTIL countdown = 0 STEP {SET countdown to countdow
 PRINT "Launching".
 STAGE.
 
+//The new plan:
+// Shortly after launch we turn toward where we want to go and then lock our steering to srfprograde
+// then we want to use PID system to control the orbital speed 
+// starting from about 300m/s to 2300m/s
+// we will however have to check and make sure that circularization occurs and that the rocket 'chase' its appoapis to reach orbit. 
+
 SET MYSTEER TO HEADING(90,90).
 LOCK STEERING TO MYSTEER. 
 UNTIL SHIP:APOAPSIS > 70000 { 

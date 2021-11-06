@@ -114,14 +114,13 @@ when STAGE:DELTAV:CURRENT < 1 then {
 	stage.
 }
 
-when SHIP:ALTITUDE < 8000 and SHIP:VELOCITY:SURFACE:MAG < 140 then {	
-	print "Deploying the main parashutes".
-	unlock steering.
+when SHIP:ALTITUDE < 8000 and SHIP:VELOCITY:SURFACE:MAG < 140 then {
+	print "Deploying the Droge shutes".
 	stage. 
 }
 
 when SHIP:ALTITUDE < 9000 and SHIP:VELOCITY:SURFACE:MAG < 290 then {
-	print "Deploying the Droge shutes".
+	print "Deploying the main parashutes".
 	stage. 
 }
 

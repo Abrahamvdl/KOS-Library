@@ -52,7 +52,7 @@ print "Apoapsis Target reached, waiting to get close to it to circularize".
 
 //SET STEERING to HEADING(90,30). //horizontal allign
 //LOCK THROTTLE to 0.1. //keep accerating into our direction.
-set timeAhead to 47.
+set timeAhead to 45.
 
 LOCK STEERING to HEADING(90,0). //horizontal allign
 until ETA:APOAPSIS < timeAhead{
@@ -77,7 +77,7 @@ until abs(APOAPSIS - PERIAPSIS) < 100 or APOAPSIS > 80000 { //wait until circula
 		if ETA:APOAPSIS < 10 {
 			set ThrottleLevel to (10 - ETA:APOAPSIS)/10.
 		} else if ETA:APOAPSIS > ETA:PERIAPSIS {
-			set ThrottleLevel to 1.//(OBT:PERIOD - ETA:APOAPSIS)/10.
+			set ThrottleLevel to (OBT:PERIOD - ETA:APOAPSIS)/10.
 		} else {
 			set ThrottleLevel to 0.
 		}
@@ -114,14 +114,13 @@ when STAGE:DELTAV:CURRENT < 1 then {
 	stage.
 }
 
-when SHIP:ALTITUDE < 8000 and SHIP:VELOCITY:SURFACE:MAG < 140 then {	
-	print "Deploying the main parashutes".
-	unlock steering.
+when SHIP:ALTITUDE < 8000 and SHIP:VELOCITY:SURFACE:MAG < 140 then {
+	print "Deploying the Droge shutes".
 	stage. 
 }
 
 when SHIP:ALTITUDE < 9000 and SHIP:VELOCITY:SURFACE:MAG < 290 then {
-	print "Deploying the Droge shutes".
+	print "Deploying the main parashutes".
 	stage. 
 }
 

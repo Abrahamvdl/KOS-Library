@@ -35,9 +35,7 @@ UNTIL SHIP:APOAPSIS > 70000 {
 	SteeringSelector(SHIP:ALTITUDE,90,100000).
 
 	//Ship specific toggles to ensure it stay sane.
-	if SHIP:VELOCITY:SURFACE:MAG > 300 { 
-		LOCK THROTTLE to 0.66. 		
-	}
+	if SHIP:VELOCITY:SURFACE:MAG > 300 { LOCK THROTTLE to 0.66. }
 
 	if STAGE:DELTAV:CURRENT < 1{
 		stage.
@@ -52,7 +50,7 @@ print "Apoapsis Target reached, waiting to get close to it to circularize".
 
 //SET STEERING to HEADING(90,30). //horizontal allign
 //LOCK THROTTLE to 0.1. //keep accerating into our direction.
-set timeAhead to 47.
+set timeAhead to 40.
 
 LOCK STEERING to HEADING(90,0). //horizontal allign
 until ETA:APOAPSIS < timeAhead{
@@ -62,7 +60,7 @@ until ETA:APOAPSIS < timeAhead{
 set ThrottleLevel to 1.
 LOCK THROTTLE to ThrottleLevel. //hard burn.
 
-until abs(APOAPSIS - PERIAPSIS) < 100 or APOAPSIS > 80000 { //wait until circularized	
+until abs(APOAPSIS - PERIAPSIS) < 100 { //wait until circularized	
 	print "Liquid fuel level: " + STAGE:DELTAV:CURRENT at (0,8).
 	
 	if ETA:APOAPSIS < timeAhead and PERIAPSIS < 0{
@@ -76,8 +74,6 @@ until abs(APOAPSIS - PERIAPSIS) < 100 or APOAPSIS > 80000 { //wait until circula
 	if PERIAPSIS > 0 {
 		if ETA:APOAPSIS < 10 {
 			set ThrottleLevel to (10 - ETA:APOAPSIS)/10.
-		} else if ETA:APOAPSIS > ETA:PERIAPSIS {
-			set ThrottleLevel to 1.//(OBT:PERIOD - ETA:APOAPSIS)/10.
 		} else {
 			set ThrottleLevel to 0.
 		}
@@ -93,19 +89,12 @@ until abs(APOAPSIS - PERIAPSIS) < 100 or APOAPSIS > 80000 { //wait until circula
 lock THROTTLE to 0. 
 
 print "Orbit Achieved!!".
-print "Enjoying Space for a minute.".
-set counter to 60.
 
-lock steering to RETROGRADE.
-
-until counter <= 0 { //wait a minute...
-	print "Time remaining: " + counter at (0,9).
-	wait 1.
-	set counter to counter - 1.
-}
+wait 60. //wait a minute...
 
 print "Starting to De-orbit.".
 
+lock steering to RETROGRADE.
 wait 2.
 lock throttle to 1. //deorbit.
 
@@ -114,14 +103,13 @@ when STAGE:DELTAV:CURRENT < 1 then {
 	stage.
 }
 
-when SHIP:ALTITUDE < 8000 and SHIP:VELOCITY:SURFACE:MAG < 140 then {	
-	print "Deploying the main parashutes".
-	unlock steering.
+when SHIP:ALTITUDE < 50000 and SHIP:VELOCITY:SURFACE:MAG < 900 then {
+	print "Deploying the Droge shutes".
 	stage. 
 }
 
 when SHIP:ALTITUDE < 9000 and SHIP:VELOCITY:SURFACE:MAG < 290 then {
-	print "Deploying the Droge shutes".
+	print "Deploying the main parashutes".
 	stage. 
 }
 

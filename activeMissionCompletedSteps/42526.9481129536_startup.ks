@@ -75,9 +75,9 @@ until abs(APOAPSIS - PERIAPSIS) < 100 or APOAPSIS > 80000 { //wait until circula
 	
 	if PERIAPSIS > 0 {
 		if ETA:APOAPSIS < 10 {
-			set ThrottleLevel to (10 - ETA:APOAPSIS)/10.
+			set ThrottleLevel to ETA:APOAPSIS/10.
 		} else if ETA:APOAPSIS > ETA:PERIAPSIS {
-			set ThrottleLevel to 1.//(OBT:PERIOD - ETA:APOAPSIS)/10.
+			set ThrottleLevel to (10 - OBT:PERIOD - ETA:APOAPSIS)/10.
 		} else {
 			set ThrottleLevel to 0.
 		}
@@ -114,14 +114,13 @@ when STAGE:DELTAV:CURRENT < 1 then {
 	stage.
 }
 
-when SHIP:ALTITUDE < 8000 and SHIP:VELOCITY:SURFACE:MAG < 140 then {	
-	print "Deploying the main parashutes".
-	unlock steering.
+when SHIP:ALTITUDE < 8000 and SHIP:VELOCITY:SURFACE:MAG < 140 then {
+	print "Deploying the Droge shutes".
 	stage. 
 }
 
 when SHIP:ALTITUDE < 9000 and SHIP:VELOCITY:SURFACE:MAG < 290 then {
-	print "Deploying the Droge shutes".
+	print "Deploying the main parashutes".
 	stage. 
 }
 
