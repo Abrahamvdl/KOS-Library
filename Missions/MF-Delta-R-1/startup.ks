@@ -205,17 +205,11 @@ if SHIP:STATUS = "SUB_ORBITAL" {
 	set vper to sqrt((eu*SHIP:BODY:MU)/(ed*OBT:SEMIMAJORAXIS)).
 	set vap  to sqrt((ed*SHIP:BODY:MU)/(eu*OBT:SEMIMAJORAXIS)).
 
-	print "Velocity at Periapsis: " + vper.
-	print "Velocity at Apoapsis:  " + vap.
-
 	set deltaVNeeded to vper - vap.
-
-	print "DeltaV needed:  " + deltaVNeeded.
-	print "Current Max thrust:  " + SHIP:MAXTHRUST.
 
   set LengthOfBurn to deltaVNeeded / SHIP:MAXTHRUST.
 
-	print "Length of Burn: " + LengthOfBurn.
+	print "Expected Duration of Burn: " + LengthOfBurn.
 
 	lock steering to prograde.
 
@@ -230,8 +224,6 @@ if SHIP:STATUS = "SUB_ORBITAL" {
 	set startTime to time:seconds.
 
 	until abs(initialAP - OBT:PERIAPSIS) < 1000   {
-		print "Current APOAPSIS: " + OBT:APOAPSIS at (0,29).
-		print "Current PERIAPSIS: " + OBT:PERIAPSIS at (0,30).
 		print "Current Difference: " + (OBT:APOAPSIS - OBT:PERIAPSIS) at (0,31).
 	}
 
@@ -245,28 +237,17 @@ if SHIP:STATUS = "SUB_ORBITAL" {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 if SHIP:STATUS = "ORBITING" and OBT:BODY:NAME = "Kerbin" {
 	//Do Mum approach.
+	print "Starting Mum approach.".
+
+  print "First we need to do orbital corrections.".
+	print "1. Inclination Correction".
+	print "2. Longitude of Accension Correction".
+	print "3. Argument of Periapsis Correction".
+
+	Print "Orbital corrections completed.".
+	print "Now we can beform the Hohmann Manuver.".
 }
 
 if SHIP:STATUS = "ESCAPING" and OBT:BODY:NAME = "Kerbin" {

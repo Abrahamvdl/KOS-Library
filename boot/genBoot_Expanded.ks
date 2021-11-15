@@ -3,14 +3,21 @@
 // http://youtube.com/gisikw
 
 function mission_file_location {
-  parameter file.  
-  
+  parameter file.
+
   return "0:/Missions/" + core:tag + "/" + file.
 }
 
-function has_new_command {  
+function has_new_command {
   if not addons:rt:hasconnection(ship) return 0.
-  return EXISTS(mission_file_location("update.ks")).  
+  return EXISTS(mission_file_location("update.ks")).
+}
+
+function requireLib {
+  parameter file.
+  if not EXISTS("1:/" + file)  and if addons:rt:hasconnection(ship)  copypath("0:/Library/" + file, "").
+
+  runpath("1:/" + file).
 }
 
 // Bootup process

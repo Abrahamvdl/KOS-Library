@@ -9,6 +9,9 @@ until 0=1{
 	print SHIP:name.
 	print "Ship Status: 	" + SHIP:Status.
 	print "Ship Type: 		" + SHIP:Type.
+	print "Ship DV at Vacuum:			" + SHIP:DELTAV:VACUUM.
+	print "Ship DV at Current:		" + SHIP:DELTAV:CURRENT.
+	print "Ship DV Curation :			" + SHIP:DELTAV:DURATION.
 	print "Ship DV:			" + SHIP:DELTAV.
 	print "Stage Num:		" + SHIP:STAGENUM.
 	print "Ship Max Thrust:	" + SHIP:MaxThrust.
@@ -48,16 +51,16 @@ until 0=1{
 	print "EPOCH:			" + OBT:EPOCH.
 	print "Transition:		" + OBT:Transition.
 	print "Position:		" + OBT:Position.
-	print "Velocity:		" + OBT:Velocity.	
+	print "Velocity:		" + OBT:Velocity.
 	print "Velocity Magn:	" + OBT:Velocity:ORBIT:MAG.
 	print "ETA APOAPSIS:	" + OBT:ETA:APOAPSIS.
 	print "ETA PERIAPSIS:	" + OBT:ETA:PERIAPSIS.
 	print "ETA Transition:	" + OBT:Transition.
-	
+
 	print " ".
 	if SHIP:STATUS = "ORBITING" and OBT:BODY:NAME = "Kerbin" {
 		print "DELTAV Used:	" + (initialDeltaV - SHIP:DELTAV).
 	}
-	
-	wait 0.2.	
+
+	wait 0.2.
 }
