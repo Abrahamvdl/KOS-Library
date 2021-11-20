@@ -130,6 +130,21 @@ function InitialTIme {
 	return -SHIP:VERTICALSPEED + SQRT(SHIP:VERTICALSPEED * SHIP:VERTICALSPEED + 2*targetHeight*20).//this is just a very rough estimate
 }
 
+function ThrottleControl{
+	parameter minHeight, targetAP.
+
+	local throttleController to PIDLOOP(1,0.1,0.001,0.001,1,0).
+	set throttleController:SETPOINT to targetAP.
+
+	return {
+		if ALTITUDE < minHeight and ETA:APOAPSIS < targetAP {
+			return 1.
+		}
+
+		return throttleController:UPDATE(TIME:SECONDS, ETA:APOAPSIS).
+	}.
+}
+
 
 clearscreen.
 
@@ -167,6 +182,7 @@ if SHIP:STATUS = "FLYING" {
 
 	set newPitch to getNewPitchAngle(pitch_ang, initTime, 0).
 	set solver to NewtonSolver(initTime, targetHeight, maxN, tolerance).
+	// set throttleController to ThrottleControl(5000, 60).
 
 	print "inititial Time: " + initTime.
 
@@ -177,6 +193,10 @@ if SHIP:STATUS = "FLYING" {
 		set pitch_ang to newPitch:call(timeToTarget).
 		print "Time to target: " + timeToTarget at (0,20).
 		print "Pitch Angle: " + pitch_ang at (0,21).
+
+		// set throttle to throttleController:CALL().
+		// print "ETA:APOAPSIS: " + ETA:APOAPSIS at (0,31).
+		// print "Throtle Val: " + throttle at (0,32).
 
 		wait 0.05.
 	}
@@ -224,7 +244,7 @@ if SHIP:STATUS = "SUB_ORBITAL" {
 	set startTime to time:seconds.
 
 	until abs(initialAP - OBT:PERIAPSIS) < 1000   {
-		print "Current Difference: " + (OBT:APOAPSIS - OBT:PERIAPSIS) at (0,31).
+		print "Current Difference: " + (OBT:APOAPSIS - OBT:PERIAPSIS) at (0,34).
 	}
 
 	set throttle to 0.
