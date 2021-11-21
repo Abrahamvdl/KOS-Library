@@ -1,0 +1,37 @@
+This a living live to document what is going on in the Library Folder.
+
+Current contents and a description:
+HM_withComments.ks --- its the HM lib but with the comments, comments were removed for the HM to fit.
+HM                  -- The original Hohmann Transfer lib, but with the comments removed such that it would fit within the 10k limit. (may be modified from the original)
+HM2                 -- Evolution of the HM script by adding the SingleManuver method.
+HM3                 -- I don't think it is adding anything new, it should be removed.
+HM4                 -- modified from HM2, Uses the very slow method of finding the PERIAPSIS by waiting until the virtual object reach that point. It works but may have a large error in where it finds the PERIAPSIS, and is thus unreliable.
+OA                  -- Modified from HM4, tries to calculate the PERIAPSIS of the virtual orbit using varies techniques, which is documented at the bottom (INCOMPLETE).
+HohmannManuver      -- The original Hohmann Transfer lib, with the original comments, I don't think it ever worked, but its original plan was to automatically fix Orbital Elements by creating the orbit at the correct positions, This plan eventually worked on HM2 and HM4, but is not very reliable really.
+L1Launcher          -- The very first Launcher script, it basically is a mashup of what is found in the KOS tutorials and Kevin Kisi's script.
+mathUtils           -- Contains a 3D rotation method.
+NodeExecutor        -- It executes nodes very accurately, but I think it can still be improved some more. It is version 1 after all
+probeabort          -- Deorbiting script for probes. I think it needs a lot of attention.
+utils               -- Contains some quality of live functions.
+
+
+TODO:
+1. The new Launcher script as built for the MF-Delta-R-1 needs to be extracted and put here.
+2. Hohmann Maneuver should be put in its own file, and maybe 2 files 1 for up and 1 for down if I can't shorten the code for it a lot.
+3. We need a virtual orbit rendezvous script, this is for when we do not have a target object in the orbit. This is surprisingly harder because a lot of the information given by a target object is not available.
+4. Target vessel orbit rendezvous script. This only do the orbit alignment, not the actual rendezvous process.
+5. Launch into an inclined orbit specifically to match a specific Longitude of Ascension. This is for those polar orbits, but also for all others really.
+6. Flyby of a target body.
+
+Further more we want a structure such that when we create the mission startup script,
+be should only give the mission parameters and select which
+libraries to uses, and then launch.
+The Startup script should use the SHIP:STATUS to determine its current step in the mission.
+Maybe we should also manually store the ship state for more specific situations in a custom file??
+All of the libraries should be stateless, meaning that it should reasonably be able to continue where it left of upon loading
+
+
+
+
+
+I will be working on the Flyby mission next.
