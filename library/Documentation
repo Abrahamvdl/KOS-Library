@@ -22,6 +22,7 @@ TODO:
 4. Target vessel orbit rendezvous script. This only do the orbit alignment, not the actual rendezvous process.
 5. Launch into an inclined orbit specifically to match a specific Longitude of Ascension. This is for those polar orbits, but also for all others really.
 6. Flyby of a target body.
+7. Lander. -- suicide burn....
 
 Further more we want a structure such that when we create the mission startup script,
 be should only give the mission parameters and select which
@@ -29,6 +30,11 @@ libraries to uses, and then launch.
 The Startup script should use the SHIP:STATUS to determine its current step in the mission.
 Maybe we should also manually store the ship state for more specific situations in a custom file??
 All of the libraries should be stateless, meaning that it should reasonably be able to continue where it left of upon loading
+
+Maybe the Library folder should have a sister folder such as lib which should
+contain the minimized versions of all the library functions, and missions should reference those.
+I saw there is a bash script in the examples GitHub of KOS that has a minimizer that we can use.
+
 
 
 
