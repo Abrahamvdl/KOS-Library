@@ -10,7 +10,7 @@ function requireLib {
 }
 
 function SetNextState{
-  set S:OLDSTATE to S:STATE. 
+  set S:OLDSTATE to S:STATE.
   set S:STATE to (S:STATE[0]:TONUMBER + 1) + ".ksm".
   WRITEJSON(S,"S.json").
 }
@@ -30,7 +30,7 @@ function main{
       movepath(mission_file(xF), mission_file(TIME:SECONDS + "_" + xF)).
       runpath(xF).
     } else { //else try to get S:STATE
-      if EXIST(STATE:OLDSTATE) deletepath(STATE:OLDSTATE).
+      if EXISTS(S:OLDSTATE) deletepath(S:OLDSTATE).
       copypath(mission_file(S:STATE), "").
       runpath(S:STATE).
     }
@@ -38,8 +38,8 @@ function main{
     Print "Currently not Connected to HOME, can't get new STATE file".
     print "Waiting 5 Seconds then rebooting".
     wait 5.
-    reboot.
   }
+  reboot.
 }
 
 main().

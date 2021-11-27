@@ -175,7 +175,7 @@ if SHIP:STATUS = "FLYING" {
 	set pitch_ang to 90.
 	lock steering to heading(90,pitch_ang).
 
-	set targetHeight to 50000.
+	set targetHeight to 55000.
 	set initTime to InitialTIme(targetHeight).
 	set maxN to 10. //should reach answer within 5 iterations.
 	set tolerance to 1. //we want to be accurate to within 1 second.
@@ -270,30 +270,4 @@ if SHIP:STATUS = "ORBITING" and OBT:BODY:NAME = "Kerbin" {
 	print "Now we can beform the Hohmann Manuver.".
 }
 
-if SHIP:STATUS = "ESCAPING" and OBT:BODY:NAME = "Kerbin" {
-	//I suppose nothing to do here?
-}
-
-if SHIP:STATUS = "ORBITING" and OBT:BODY:NAME = "Mum" {
-	//TODO
-}
-
-if SHIP:STATUS = "ESCAPING" and OBT:BODY:NAME = "Mum" {
-	//TODO
-}
-
-//TODO capturing and landing.
-
-
-
-
-
-
-
-
-
-
-
-print "Good luck going to Mum.".
-
-SHUTDOWN.
+SetNextState().
