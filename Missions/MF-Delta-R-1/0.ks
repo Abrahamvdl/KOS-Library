@@ -256,18 +256,4 @@ if SHIP:STATUS = "SUB_ORBITAL" {
 	wait 10.
 }
 
-
-if SHIP:STATUS = "ORBITING" and OBT:BODY:NAME = "Kerbin" {
-	//Do Mum approach.
-	print "Starting Mum approach.".
-
-  print "First we need to do orbital corrections.".
-	print "1. Inclination Correction".
-	print "2. Longitude of Accension Correction".
-	print "3. Argument of Periapsis Correction".
-
-	Print "Orbital corrections completed.".
-	print "Now we can beform the Hohmann Manuver.".
-}
-
 SetNextState().
