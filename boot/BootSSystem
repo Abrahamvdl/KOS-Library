@@ -1,0 +1,33 @@
+The Boot_S_System works as follows
+
+1. A Lexicon with Key "STATE" and Value 0 is created.
+2. The Lexicon is writen to '1:/S' in JSON format.
+3. All of the files in the folder 0:/Missions/<SHIPNAME>/ is compiled.
+4. 0:/Missions/<SHIPNAME>/0.ksm is copied to the root folder.
+5. if 0.ksm was copied then we both copy and compile genBootS to 1:/boot/
+6. genBootS is set as the boot file.
+7. System is rebooted.
+8. if 0.ksm was not available then we wait 5 seconds and reboot.
+
+At this point we expect genBootS to start:
+1. use READJSON to read S to find the STATE.
+2. check that we have S:STATE.VALUE in our root folder and run it if we have.
+3. if we do not have S:STATE:VALUE in our root then try to download it.
+4. We should allow for emergency code execution in the form of X.ks if this file is available.
+
+
+
+
+
+1. InitBootS starts by writing '0.ksm' to file '1:/S'.
+2. The SHIP:NAME is used to fetch the mission files from '0:/Missions/<SHIPNAME>/<X>.ks' where X is the content of '1:/S'
+3. Thus on Archive 0 we expect to always have the <SHIPNAME> folder in Missions, and at the very least 0.ks in there.
+   We hope to have a mission doc there also to give some more information on that is going on.
+
+TODO: check if we can execute files without an extension, such that we can maybe have a minification
+  system that drops the extension and that file is loaded instead.
+
+I have read the compile documentation some, and it seems that we really don't need a minification program/system, since
+we can compile the source into source. We will lose some debug information along the way, but we may save alot of space.
+
+So we are going to add this compile code to the Boot_S_System.
