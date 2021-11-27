@@ -9,6 +9,12 @@ function requireLib {
   runpath("1:/" + file).
 }
 
+function SetNextState{
+  set S:OLDSTATE to S:STATE. 
+  set S:STATE to (S:STATE[0]:TONUMBER + 1) + ".ksm".
+  WRITEJSON(S,"S.json").
+}
+
 function main{
   // Bootup process
   set ship:control:pilotmainthrottle to 0.
@@ -24,6 +30,7 @@ function main{
       movepath(mission_file(xF), mission_file(TIME:SECONDS + "_" + xF)).
       runpath(xF).
     } else { //else try to get S:STATE
+      if EXIST(STATE:OLDSTATE) deletepath(STATE:OLDSTATE).
       copypath(mission_file(S:STATE), "").
       runpath(S:STATE).
     }

@@ -6,6 +6,7 @@ function Create_S_File{
 
   set S to LEXICON().
   S:ADD("STATE","0.ksm").
+  S:ADD("OLDSTATE","0.ksm").
   WRITEJSON(S,"S.json").
 }
 
@@ -29,7 +30,7 @@ function Compile_Mission{
 
 function CopyStartup{
   print "Copying Startup program".
-  set missionFile to "0:/Missions/" + SHIP:SHIPNAME + "/0.ksm").
+  set missionFile to "0:/Missions/" + SHIP:SHIPNAME + "/0.ksm".
   if EXISTS(missionFile) {
     copypath(missionFile,"").
     return true.
@@ -50,7 +51,7 @@ function SetupGenBoot{
 
   	if canStart {
   		set CORE:BOOTFILENAME to "boot/genBootS.ksm".
-  		deletepath("1:/boot/initBoot.ks").
+  		deletepath("1:/boot/initBootS.ks").
 
   		print "Starting Main boot in 2 seconds.".
   		wait 2.
@@ -61,6 +62,7 @@ function SetupGenBoot{
 
 //Main Entry point.
 function main{
+  wait 2.
   Print "Starting Initial Boot S".
   Print "SHIPNAME: " + SHIP:SHIPNAME.
   wait 1.
