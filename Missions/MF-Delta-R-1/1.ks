@@ -1,6 +1,8 @@
+requireLib("mathUtils").
+
 function AngleForIntersection {
 	parameter Orbit1, Orbit2.
-	return Constant:RadToDeg * CONSTANT:PI * (1 - (1 / (2* SQRT(2))) * SQRT((Orbit1:SEMIMAJORAXIS/Orbit2:SEMIMAJORAXIS + 1)^3)).
+	return abs(Constant:RadToDeg * CONSTANT:PI * (1 - 1.41421356237 * SQRT((Orbit1:SEMIMAJORAXIS/Orbit2:SEMIMAJORAXIS + 1)^3))).
 }
 
 function TimeFromBurnToApproach {
@@ -12,18 +14,25 @@ function TimeFromBurnToApproach {
 //delta V necessary for the orbits
 function DELTAV1 {
 	parameter Orbit1, Orbit2.
-	return SQRT(2*Orbit1:BODY:MU/Orbit1:SEMIMAJORAXIS) * (SQRT(2*Orbit2:SEMIMAJORAXIS/(Orbit1:SEMIMAJORAXIS+Orbit2:SEMIMAJORAXIS)) - 1).
+	set sum to Orbit1:SEMIMAJORAXIS+Orbit2:SEMIMAJORAXIS.
+	return SQRT(Orbit1:BODY:MU/Orbit1:SEMIMAJORAXIS) * (SQRT(2*Orbit2:SEMIMAJORAXIS/sum) - 1).
 }
 
 function DELTAV2 {
 	parameter Orbit1, Orbit2.
-	return SQRT(2*Orbit2:BODY:MU/Orbit2:SEMIMAJORAXIS) * (1 - SQRT(2*Orbit1:SEMIMAJORAXIS/(Orbit1:SEMIMAJORAXIS+Orbit2:SEMIMAJORAXIS))).
+	set sum to Orbit1:SEMIMAJORAXIS+Orbit2:SEMIMAJORAXIS.
+	return SQRT(Orbit2:BODY:MU/Orbit2:SEMIMAJORAXIS) * (1 - SQRT(2*Orbit1:SEMIMAJORAXIS/sum)).
 }
 
 function TOTALDELTAVFORHM {
 	parameter Orbit1, Orbit2.
 
 	return DELTAV1(Orbit1, Orbit2) + DELTAV2(Orbit1, Orbit2).
+}
+
+function ValueDiff {
+	parameter Val1, Val2, tolerance.
+	return val1 + tolerance > val2 and val1 - tolerance < val2.
 }
 
 clearscreen.
@@ -42,46 +51,59 @@ if SHIP:STATUS = "ORBITING" and OBT:BODY:NAME = "Kerbin" {
   print "Target Angle is: " + AngleForIntersect.
   print "Target DeltaV1: " + DV1.
 
-  lock AngleDiff to vang(SHIP:POSITION - Kerbin:POSITION, TARGET:POSITION - Kerbin:POSITION).
+
+	//we need some way to ensure that the angle we target is such that the target object is ahead us.
+	lock ShipPointy to SHIP:POSITION - OBT:BODY:POSITION.
+	lock TargetVector to TARGET:POSITION - OBT:BODY:POSITION.
+  lock AngleDiff to vang(TargetVector, ShipPointy).
+	set UpVector to vcrs(ShipPointy, SHIP:VELOCITY:ORBIT).
+	lock TargetFlyToVector to RotateVector(AngleDiff, UpVector, ShipPointy).
+
+//	set vd4 TO VECDRAW(Kerbin:position, TARGET:POSITION - Kerbin:position, RGB(1,0,0), "Target Pos", 1.0, TRUE, 0.2, TRUE,	TRUE ).
 
   set kuniverse:timewarp:mode to "RAILS".
-	until ABS(AngleDiff - AngleForIntersect) < 1 {
-		print "Angle Diff: " + ABS(AngleDiff - AngleForIntersect) at (0,10).
+	until TargetFlyToVector:NORMALIZED * TargetVector:NORMALIZED >= 0.9996 {
+		print "Angle Diff: " + AngleDiff at (0,10).
+		print "Dot product of the two vectors of interest: " + TargetFlyToVector:NORMALIZED * TargetVector:NORMALIZED at (0,11).
 
-		set kuniverse:timewarp:rate to ABS(AngleDiff - AngleForIntersect) * 5.
+		CLEARVECDRAWS().
+
+	  set vd1 TO VECDRAW(Kerbin:position, TargetVector, RGB(1,0,0), "Target", 1.0, TRUE, 0.2, TRUE,	TRUE ).
+		set vd2 TO VECDRAW(Kerbin:position, ShipPointy, RGB(0,1,0), "Us", 1.0, TRUE, 0.2, TRUE,	TRUE ).
+		set vd3 TO VECDRAW(Kerbin:position, TargetFlyToVector, RGB(0,0,1), "OurAim", 1.0, TRUE, 0.2, TRUE,	TRUE ).
+
+		set DiffVal to TargetFlyToVector:NORMALIZED * TargetVector:NORMALIZED.
+		set kuniverse:timewarp:rate to -999/2*DiffVal + 1001/2. //y=mx+c
 		wait 0.1.
 	}
 	kuniverse:timewarp:cancelwarp().
+	CLEARVECDRAWS().
 
   //Since we do not have access to Nodes, we will have to burn the exact amount of DeltaV calculated.
   lock steering to PROGRADE.
+	wait until (SHIP:FACING:FOREVECTOR:NORMALIZED * PROGRADE:FOREVECTOR:NORMALIZED) >= 0.9996.
 
   set initialDV to STAGE:DELTAV:CURRENT.
   set THROTTLE to 1.
   until (initialDV - STAGE:DELTAV:CURRENT) >= DV1 {
-    print "DeltaV burned: " + (initialDV - STAGE:DELTAV:CURRENT) at (0,11).
+    print "DeltaV burned: " + (initialDV - STAGE:DELTAV:CURRENT) at (0,13).
   }
   set THROTTLE to 0.
 
-  if SHIP:STATUS = "ESCAPING" and OBT:BODY:NAME = "Kerbin" {
-    print "We have a transition!".
-    print "Waiting until we reach Mun.".
-
-    wait until OBT:BODY:NAME = "Mun".
-  }else{
-    print "Transition not achieved.".
-  }
-
-  wait 10.
+	//with our current technology we can't know if we have a transition, so best is to wait and see.
+	set kuniverse:timewarp:mode to "RAILS".
+	set kuniverse:timewarp:rate to 1000.
+	wait until OBT:BODY:NAME = "Mun".
+	kuniverse:timewarp:cancelwarp().
 }
 
-if SHIP:STATUS = "ESCAPING" and OBT:BODY:NAME = "Kerbin" {
-	//I suppose nothing to do here?
-}
-
-if SHIP:STATUS = "ESCAPING" and OBT:BODY:NAME = "Mun" {
+if OBT:BODY:NAME = "Mun" {
   print "Enjoying Mum?".
   print "Do some science".
+
+	// SET P TO SHIP:PARTSNAMED("GooExperiment")[0].
+	// SET M TO P:GETMODULE("ModuleScienceExperiment").
+	// M:DEPLOY.
 
   //nothing to do until we are in the influence of Kerbin again.
   wait until OBT:BODY:NAME = "Kerbin".
@@ -90,22 +112,18 @@ if SHIP:STATUS = "ESCAPING" and OBT:BODY:NAME = "Mun" {
 
 if OBT:BODY:NAME = "Kerbin" {
   //TODO capturing and landing.
-  wait until ETA:APOAPSIS < 20.
+  wait until ALTITUDE < 150000.
   print "Approaching the capture burn.".
   lock STEERING to RETROGRADE.
-  set throttle to 1.
-  wait until PERIAPSIS < 30000.
-  set throttle to 0.
+  set throttle to 1. //burn all the fuel.
 
-  print "Waiting until we reach the Kerbin atmosphere.".
   wait until ALTITUDE < 50000.
-  set throttle to 1. //use up the rest of our fuel.
-
   stage. //drop the fuel tank and engine.
 
   lock steering to SRFRETROGRADE.
   wait until ALTITUDE < 10000.
   Stage.
+	unlock steering.
 }
 
 SHUTDOWN.

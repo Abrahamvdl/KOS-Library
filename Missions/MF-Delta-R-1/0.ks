@@ -157,7 +157,7 @@ if SHIP:STATUS = "PRELAUNCH" {
 		WAIT 1.
 	}
 
-	PRINT "Launching".
+	PRINT "Launching now".
 	STAGE.
 
 	wait 0.5.
@@ -175,7 +175,7 @@ if SHIP:STATUS = "FLYING" {
 	set pitch_ang to 90.
 	lock steering to heading(90,pitch_ang).
 
-	set targetHeight to 55000.
+	set targetHeight to 50000.
 	set initTime to InitialTIme(targetHeight).
 	set maxN to 10. //should reach answer within 5 iterations.
 	set tolerance to 1. //we want to be accurate to within 1 second.
@@ -242,9 +242,17 @@ if SHIP:STATUS = "SUB_ORBITAL" {
 
 	set initialAP to OBT:APOAPSIS.
 	set startTime to time:seconds.
+	set isAtMinEllipse to false.
+	set curEllipseVal to OBT:ECCENTRICITY.
 
-	until abs(initialAP - OBT:PERIAPSIS) < 1000   {
+	until abs(initialAP - OBT:PERIAPSIS) < 1000 or (isAtMinEllipse and OBT:ECCENTRICITY < 0.003)  {
 		print "Current Difference: " + (OBT:APOAPSIS - OBT:PERIAPSIS) at (0,34).
+		if OBT:ECCENTRICITY < curEllipseVal {
+			set curEllipseVal to OBT:ECCENTRICITY.
+			set isAtMinEllipse to false.
+		}{
+			set isAtMinEllipse to TRUE.
+		}
 	}
 
 	set throttle to 0.
