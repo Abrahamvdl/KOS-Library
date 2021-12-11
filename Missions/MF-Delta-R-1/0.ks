@@ -145,6 +145,15 @@ function ThrottleControl{
 	}.
 }
 
+function DeltaVForCirc{
+	set eu to 1+OBT:ECCENTRICITY.
+	set ed to 1-OBT:ECCENTRICITY.
+	set vper to sqrt((eu*SHIP:BODY:MU)/(ed*OBT:SEMIMAJORAXIS)).
+	set vap  to sqrt((ed*SHIP:BODY:MU)/(eu*OBT:SEMIMAJORAXIS)).
+
+	return deltaVNeeded to vper - vap.
+}
+
 
 clearscreen.
 
@@ -170,6 +179,16 @@ if SHIP:STATUS = "FLYING" {
 		stage.
 		wait 0.3.
 		set throttle to 1.
+	}
+
+	when ALTITUDE > 15000 then{
+		set kuniverse:timewarp:mode to "PHYSICS".
+		set kuniverse:timewarp:rate to 2.
+	}
+
+	when ALTITUDE > 50000 then{
+		set kuniverse:timewarp:mode to "PHYSICS".
+		set kuniverse:timewarp:rate to 4.
 	}
 
 	set pitch_ang to 90.
@@ -214,46 +233,82 @@ if SHIP:STATUS = "FLYING" {
 
 if SHIP:STATUS = "SUB_ORBITAL" {
 	//Do circularization
+	clearscreen.
 	Print "Starting circularization".
+
+	when STAGE:DELTAV:CURRENT < 0.2 then{
+		stage.
+	}
+	wait 1.
 
 	//we need to calculate how much deltaV is necessary to circuralize
 	//then we need to calculate how long it will take to expend that deltaV,
 	//then we can travel to correct ETA and then do the burn.
 
-	set eu to 1+OBT:ECCENTRICITY.
-	set ed to 1-OBT:ECCENTRICITY.
-	set vper to sqrt((eu*SHIP:BODY:MU)/(ed*OBT:SEMIMAJORAXIS)).
-	set vap  to sqrt((ed*SHIP:BODY:MU)/(eu*OBT:SEMIMAJORAXIS)).
 
-	set deltaVNeeded to vper - vap.
 
-  set LengthOfBurn to deltaVNeeded / SHIP:MAXTHRUST.
+	set LengthOfBurn to DeltaVForCirc() / SHIP:MAXTHRUST.
+	if DeltaVForCirc() > STAGE:DELTAV:CURRENT { //burntime needs to be adjusted since we have to stage in the middle of the burn.
+		set LengthOfBurn to STAGE:DELTAV:CURRENT / SHIP:MAXTHRUST.
+
+		LOCAL all_e IS LIST().
+		LIST ENGINES IN all_e.
+		FOR e IN all_e {
+			IF not e:IGNITION {
+    		set LengthOfBurn to LengthOfBurn + (deltaVNeeded - STAGE:DELTAV:CURRENT) / e:POSSIBLETHRUST.
+			}
+		}
+	}
 
 	print "Expected Duration of Burn: " + LengthOfBurn.
 
 	lock steering to prograde.
 
-	wait until ETA:APOAPSIS < LengthOfBurn/2.
-	set throttle to 1.
-
-	when STAGE:DELTAV:CURRENT < 0.2 then{
-		stage.
+	set kuniverse:timewarp:mode to "RAILS".
+	// until ETA:APOAPSIS < LengthOfBurn/2 {
+	until ETA:APOAPSIS < LengthOfBurn/2 {
+		set kuniverse:timewarp:rate to ETA:APOAPSIS - 20.
+		wait 0.1.
 	}
+	kuniverse:timewarp:cancelwarp().
 
+	// wait until ETA:APOAPSIS < LengthOfBurn/2.
+	// set throttle to 1.
+
+	set APChase to PIDLOOP(0.5,0.1,0.01,0.0001,1).
+
+	set APChase:SETPOINT to LengthOfBurn/2.
 	set initialAP to OBT:APOAPSIS.
-	set startTime to time:seconds.
-	set isAtMinEllipse to false.
-	set curEllipseVal to OBT:ECCENTRICITY.
+	set mythrot to 0.
+	lock throttle to mythrot.
+	until abs(initialAP - OBT:PERIAPSIS) < 100 or //this is the main target.
+				OBT:PERIAPSIS > initialAP or //we have pass initial point.
+				OBT:ECCENTRICITY < 0.003 or //this is the best case
+				OBT:APOAPSIS > initialAP * 2 { //worst case
+  	set mythrot to APChase:UPDATE(TIME:SECONDS, ETA:APOAPSIS).
+  	wait 0.
 
-	until abs(initialAP - OBT:PERIAPSIS) < 1000 or (isAtMinEllipse and OBT:ECCENTRICITY < 0.003)  {
-		print "Current Difference: " + (OBT:APOAPSIS - OBT:PERIAPSIS) at (0,34).
-		if OBT:ECCENTRICITY < curEllipseVal {
-			set curEllipseVal to OBT:ECCENTRICITY.
-			set isAtMinEllipse to false.
-		}{
-			set isAtMinEllipse to TRUE.
+		if SHIP:MAXTHRUST > 0 and OBT:PERIAPSIS < 50000 {
+			set APChase:SETPOINT to DeltaVForCirc() / (SHIP:MAXTHRUST * 2).
 		}
+
+		if OBT:PERIAPSIS > 50000 {set APChase:SETPOINT to 10.}
 	}
+	unlock throttle.
+
+	set startTime to time:seconds.
+	// set isAtMinEllipse to false.
+	// set curEllipseVal to OBT:ECCENTRICITY.
+
+	// until abs(initialAP - OBT:PERIAPSIS) < 1000 or (isAtMinEllipse and OBT:ECCENTRICITY < 0.003)  {
+	// 	print "Current Difference: " + (OBT:APOAPSIS - OBT:PERIAPSIS) at (0,34).
+	// 	if OBT:ECCENTRICITY < curEllipseVal {
+	// 		set curEllipseVal to OBT:ECCENTRICITY.
+	// 		set isAtMinEllipse to false.
+	// 	}{
+	// 		set isAtMinEllipse to TRUE.
+	// 	}
+	// }
 
 	set throttle to 0.
 	set timeDiff to time:seconds - startTime.
@@ -261,7 +316,7 @@ if SHIP:STATUS = "SUB_ORBITAL" {
 
 	print "Orbit Achieved!!".
 
-	wait 10.
+	wait 1.
 }
 
 SetNextState().
