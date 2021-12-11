@@ -172,6 +172,16 @@ if SHIP:STATUS = "FLYING" {
 		set throttle to 1.
 	}
 
+	when ALTITUDE > 300 then{
+		set kuniverse:timewarp:mode to "PHYSICS".
+		set kuniverse:timewarp:rate to 2.
+	}
+
+	when ALTITUDE > 50000 then{
+		set kuniverse:timewarp:mode to "PHYSICS".
+		set kuniverse:timewarp:rate to 4.
+	}
+
 	set pitch_ang to 90.
 	lock steering to heading(90,pitch_ang).
 
@@ -237,6 +247,13 @@ stage.
 
 	lock steering to prograde.
 
+	set kuniverse:timewarp:mode to "RAILS".
+	until ETA:APOAPSIS < LengthOfBurn/2 {
+		set kuniverse:timewarp:rate to ETA:APOAPSIS - LengthOfBurn/2.
+		wait 0.1.
+	}
+	kuniverse:timewarp:cancelwarp().
+
 	wait until ETA:APOAPSIS < LengthOfBurn/2.
 	set throttle to 1.
 
@@ -264,7 +281,7 @@ stage.
 
 if SHIP:STATUS = "ORBITING" {
 	print "Enjoying Space for a minute.".
-	set counter to 60.
+	set counter to 10.
 
 	lock steering to RETROGRADE.
 
@@ -276,12 +293,24 @@ if SHIP:STATUS = "ORBITING" {
 
 	print "Starting to De-orbit.".
 
-	wait 2.
 	lock throttle to 1. //deorbit.
 
 	when STAGE:DELTAV:CURRENT < 1 then {
 		print "Dropping the last booster".
 		stage.
+	}
+
+	wait until STAGE:DELTAV:CURRENT < 1.
+	set kuniverse:timewarp:mode to "RAILS".
+	until ALTITUDE < 70000 {
+		set kuniverse:timewarp:rate to 50.
+		wait 0.1.
+	}
+	kuniverse:timewarp:cancelwarp().
+
+	when ALTITUDE < 70000 then{
+		set kuniverse:timewarp:mode to "PHYSICS".
+		set kuniverse:timewarp:rate to 4.
 	}
 
 	when SHIP:ALTITUDE < 8000 and SHIP:VELOCITY:SURFACE:MAG < 140 then {
@@ -299,6 +328,7 @@ if SHIP:STATUS = "ORBITING" {
 	print "Ship landed.".
 	print "".
 	print "Shutting down.".
+	kuniverse:timewarp:cancelwarp().
 
 	SET SHIP.CONTROL.PILOTMAINTHROTTLE to 0.
 
