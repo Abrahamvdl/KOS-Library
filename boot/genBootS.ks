@@ -36,8 +36,14 @@ function main{
     }
   } else {
     Print "Currently not Connected to HOME, can't get new STATE file".
-    print "Waiting 5 Seconds then rebooting".
-    wait 5.
+    Print "Going on rails until we have connection".
+    set kuniverse:timewarp:mode to "RAILS".
+    until HOMECONNECTION:ISCONNECTED {
+      set kuniverse:timewarp:rate to 100.
+      wait 0.
+    }
+    kuniverse:timewarp:cancelwarp().
+
   }
   reboot.
 }
