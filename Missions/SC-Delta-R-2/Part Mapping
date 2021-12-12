@@ -1,0 +1,132 @@
+Part: Experimental Return Unit
+0 is the flag - no events, actions
+1 is ModuleConductionMultiplier - no events, actions
+2 is ModuleCargoPart - no events, actions
+3 is Refunding - no events, actions
+4 is HotSpotModule
+      temp, thermal rate and some others
+5 is ModuleCommand
+      comm signal
+      comm first hip dist
+      command state
+      and others
+6 is HardDrive
+      capacity
+      data - is event
+7 is KOSNameTag
+      name
+8 is TrajectoriesVesselSettings - no events, actions
+9 is ModuleTripLogger - no events, actions
+
+Part: Small Inline Reaction Wheel
+0 is ModuleReactionWheel
+    reaction wheels as int
+    wheel authority
+    reaction wheels as string
+    Event - torque
+    Action - cycle wheel Mode
+    Action - activate wheel
+    Action - decactivate wheel
+    Action - toggle rw
+1 is ModuleCargoPart
+2 is Refunding
+3 is TweakScale
+4 is HotSpotModule
+5 is Reliability
+6 is KOSNameTag
+
+Part: CX-4181 Scriptable Control system
+0 is kOSProcessor
+      diskspace
+      kos average power
+      open terminal
+      close terminal
+      toggle power
+      Action open terminal
+      Action close terminal
+      Action toggle suppression
+1 is Refunding
+2 is HotSpotModule
+3 is KOSNameTag
+
+
+Part: Communotron 16-S
+0. ModuleCargoPart
+1. Refunding
+2. TweakScale
+3. HotSpotModule
+4. KOSNameTag
+5. ModuleRTAntenna
+  Fields
+    energy
+    omni range
+    STATUS
+    auto threshold
+    deactivate
+    activate
+    science packet size
+    science packet interval
+    science packet cost
+    Target
+  Events
+    Deactivate
+    Probably has Activate also
+    transmit all science
+  Actions
+    toggle
+    Activate
+    deactivate
+6. ModuleSPIPassive
+7. PlannerController
+8. Reliability
+9. ModuleRTDataTransmitter
+
+Part: Mystery Goo™ Containment Unit
+2. Experiment
+  Events
+    <b>mystery goo™ observation</b>: <color=#ffd200>stopped</color>
+    info
+  Actions
+    start: mystery .....
+    stop: mystery ....
+
+Part: SC-9001 Science Jr.
+2. Experiment
+  events
+    <b>materials study</b>: <color=#ffd200>stopped</color>
+    <b>info</b>: <color=#6dcff6><b>1.1</b></color> / 1.1 t-none
+  Actions
+    start: materials study
+    stop: materials study
+
+
+Part: ER-7500 Computer Flight Unit (data storage)
+  0. FlightEngineeringModule
+    verbose simulation log
+  1. TapeDriveAnimator
+  3. HardDrive
+    capacity
+    data
+    transfer data here
+
+Part: 2HOT Thermometer
+  2. Experiment
+    <b>temperature scan</b>: <color=#ffd200>stopped</color>
+    info
+   Actions
+    start: temperature scan
+    stop: temperature scan
+  4. Sensor
+    temperature
+
+Part: Geiger Counter
+0. Sensor
+  radiation
+2. Experiment
+  <b>radiation scan</b>: <color=#ffd200>stopped</color>
+
+Part: PresMat Barometer
+2. Experiment
+  <b>atmospheric pressure scan</b>: <color=#ffd200>stopped</color>
+4. Sensor
+  pressure
