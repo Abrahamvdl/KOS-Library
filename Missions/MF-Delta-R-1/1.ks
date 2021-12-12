@@ -1,4 +1,5 @@
 requireLib("mathUtils").
+toggle lights. //this is to turn on the reaction wheels
 
 function AngleForIntersection {
 	parameter Orbit1, Orbit2.
@@ -52,6 +53,7 @@ if SHIP:STATUS = "ORBITING" and OBT:BODY:NAME = "Kerbin" {
 		//we need to raise our orbit, since the vector operations don't seem to function if the angles are greater than 90degrees.
 
 		print "First going to the PERIAPSIS".
+		toggle lights.
 		set kuniverse:timewarp:mode to "RAILS".
 		until ETA:PERIAPSIS < 5 {
 			set kuniverse:timewarp:rate to ETA:PERIAPSIS.
@@ -61,11 +63,13 @@ if SHIP:STATUS = "ORBITING" and OBT:BODY:NAME = "Kerbin" {
 
 		print "And raise the the APOAPSIS".
 
+		toggle lights. wait 0.2.
 		lock steering to PROGRADE.
 		wait 2.
 		set throttle to 1.
 		wait until APOAPSIS > targeAlt.
 		set throttle to 0.
+		toggle lights. wait 0.2.
 
 		print "Then going to the PERIAPSIS".
 		until ETA:APOAPSIS < 15 {
@@ -74,6 +78,7 @@ if SHIP:STATUS = "ORBITING" and OBT:BODY:NAME = "Kerbin" {
 		}
 		kuniverse:timewarp:cancelwarp().
 
+		toggle lights. wait 0.2.
 		print "And raise the the PERIAPSIS".
 		wait 2.
 		set throttle to 1.
@@ -104,6 +109,7 @@ if SHIP:STATUS = "ORBITING" and OBT:BODY:NAME = "Kerbin" {
 
 //	set vd4 TO VECDRAW(Kerbin:position, TARGET:POSITION - Kerbin:position, RGB(1,0,0), "Target Pos", 1.0, TRUE, 0.2, TRUE,	TRUE ).
 
+	toggle lights. wait 0.2.
   set kuniverse:timewarp:mode to "RAILS".
 	until TargetFlyToVector:NORMALIZED * TargetVector:NORMALIZED >= 0.9996 {
 		print "Angle Diff: " + AngleDiff at (0,10).
@@ -123,6 +129,7 @@ if SHIP:STATUS = "ORBITING" and OBT:BODY:NAME = "Kerbin" {
 	CLEARVECDRAWS().
 
   //Since we do not have access to Nodes, we will have to burn the exact amount of DeltaV calculated.
+	toggle lights. wait 0.2.
   lock steering to PROGRADE.
 	wait until (SHIP:FACING:FOREVECTOR:NORMALIZED * PROGRADE:FOREVECTOR:NORMALIZED) >= 0.9996.
 
@@ -137,6 +144,7 @@ if SHIP:STATUS = "ORBITING" and OBT:BODY:NAME = "Kerbin" {
 	wait 1.
 
 	//with our current technology we can't know if we have a transition, so best is to wait and see.
+	toggle lights. wait 0.2.
 	set kuniverse:timewarp:mode to "RAILS".
 	set kuniverse:timewarp:rate to 1000.
 	wait until OBT:BODY:NAME = "Mun".
@@ -145,11 +153,11 @@ if SHIP:STATUS = "ORBITING" and OBT:BODY:NAME = "Kerbin" {
 
 if OBT:BODY:NAME = "Mun" {
   print "Enjoying Mum?".
-  print "Do some science".
+  print "Lets do some science".
 
-	// SET P TO SHIP:PARTSNAMED("GooExperiment")[0].
-	// SET M TO P:GETMODULE("ModuleScienceExperiment").
-	// M:DEPLOY.
+	SHIP:PARTSDUBBED("Geiger Counter")[0]:GETMODULE("Experiment"):DOEVENT("<b>radiation scan</b>: <color=#ffd200>stopped</color>").
+	SHIP:PARTSDUBBED("Mystery Goo™ Containment Unit")[0]:GETMODULE("Experiment"):DOEVENT("<b>mystery goo™ observation</b>: <color=#ffd200>stopped</color>").
+	SHIP:PARTSDUBBED("2HOT Thermometer")[0]:GETMODULE("Experiment"):DOEVENT("<b>temperature scan</b>: <color=#ffd200>stopped</color>").
 
   //nothing to do until we are in the influence of Kerbin again.
   wait until OBT:BODY:NAME = "Kerbin".
@@ -159,6 +167,7 @@ if OBT:BODY:NAME = "Mun" {
 if OBT:BODY:NAME = "Kerbin" {
   // after the flyby the PERIAPSIS is too col, so we want to raise it a bit higher.
 
+	toggle lights. wait 0.2.
   lock STEERING to PROGRADE.
   set throttle to 1. //burn all the fuel.
   wait until PERIAPSIS > 50000.
@@ -166,6 +175,7 @@ if OBT:BODY:NAME = "Kerbin" {
 
   lock throttle to RETROGRADE.
 
+	toggle lights. wait 0.2.
   set kuniverse:timewarp:mode to "RAILS".
   // until ETA:APOAPSIS < LengthOfBurn/2 {
   until ALTITUDE < 70000 {
@@ -181,10 +191,12 @@ if OBT:BODY:NAME = "Kerbin" {
   }
   kuniverse:timewarp:cancelwarp().
 
+	toggle lights. wait 0.2.
   set throttle to 1. //burn all the fuel.
   wait until STAGE:DELTAV:CURRENT < 2.
   stage. //drop the fuel tank and engine.
 
+	toggle lights. wait 0.2.
   lock steering to SRFRETROGRADE.
 
   when ALTITUDE < 70000 then{

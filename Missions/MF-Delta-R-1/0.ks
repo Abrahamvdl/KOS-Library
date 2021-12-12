@@ -1,3 +1,7 @@
+SHIP:PARTSDUBBED("CX-4181 Scriptable Control System")[0]:GETMODULEBYINDEX(0):DOEVENT("open terminal").
+set terminal:WIDTH to 50.
+set terminal:HEIGHT to 60.
+
 function distanceAccel {
 	parameter s0, v0, accel, t.
 	return s0 + v0*t + 0.5*accel*t*t.
@@ -314,6 +318,8 @@ if SHIP:STATUS = "SUB_ORBITAL" {
 	print "Burn time was: " + timeDiff.
 
 	print "Orbit Achieved!!".
+
+	toggle lights. //this is to turn off the reaction wheels
 
 	wait 1.
 }
