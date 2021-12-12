@@ -151,7 +151,7 @@ function DeltaVForCirc{
 	set vper to sqrt((eu*SHIP:BODY:MU)/(ed*OBT:SEMIMAJORAXIS)).
 	set vap  to sqrt((ed*SHIP:BODY:MU)/(eu*OBT:SEMIMAJORAXIS)).
 
-	return deltaVNeeded to vper - vap.
+	return vper - vap.
 }
 
 
@@ -245,8 +245,6 @@ if SHIP:STATUS = "SUB_ORBITAL" {
 	//then we need to calculate how long it will take to expend that deltaV,
 	//then we can travel to correct ETA and then do the burn.
 
-
-
 	set LengthOfBurn to DeltaVForCirc() / SHIP:MAXTHRUST.
 	if DeltaVForCirc() > STAGE:DELTAV:CURRENT { //burntime needs to be adjusted since we have to stage in the middle of the burn.
 		set LengthOfBurn to STAGE:DELTAV:CURRENT / SHIP:MAXTHRUST.
@@ -255,7 +253,7 @@ if SHIP:STATUS = "SUB_ORBITAL" {
 		LIST ENGINES IN all_e.
 		FOR e IN all_e {
 			IF not e:IGNITION {
-    		set LengthOfBurn to LengthOfBurn + (deltaVNeeded - STAGE:DELTAV:CURRENT) / e:POSSIBLETHRUST.
+    		set LengthOfBurn to LengthOfBurn + (DeltaVForCirc() - STAGE:DELTAV:CURRENT) / e:POSSIBLETHRUST.
 			}
 		}
 	}
@@ -283,13 +281,14 @@ if SHIP:STATUS = "SUB_ORBITAL" {
 	lock throttle to mythrot.
 	until abs(initialAP - OBT:PERIAPSIS) < 100 or //this is the main target.
 				OBT:PERIAPSIS > initialAP or //we have pass initial point.
-				OBT:ECCENTRICITY < 0.003 or //this is the best case
+				OBT:ECCENTRICITY < 0.001 or //this is the best case
 				OBT:APOAPSIS > initialAP * 2 { //worst case
   	set mythrot to APChase:UPDATE(TIME:SECONDS, ETA:APOAPSIS).
   	wait 0.
 
-		if SHIP:MAXTHRUST > 0 and OBT:PERIAPSIS < 50000 {
+		if SHIP:MAXTHRUST > 0 and OBT:PERIAPSIS < 50000 and DeltaVForCirc() / (SHIP:MAXTHRUST * 2) > 10 {
 			set APChase:SETPOINT to DeltaVForCirc() / (SHIP:MAXTHRUST * 2).
+			print "Chase Point: " + APChase:SETPOINT at (0,3).
 		}
 
 		if OBT:PERIAPSIS > 50000 {set APChase:SETPOINT to 10.}

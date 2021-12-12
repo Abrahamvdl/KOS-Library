@@ -45,6 +45,49 @@ if SHIP:STATUS = "ORBITING" and OBT:BODY:NAME = "Kerbin" {
 
   set TARGET to "Mun".
 
+	set targeAlt to 125000.
+
+	if OBT:PERIAPSIS < targeAlt {
+		print "We have to raise the Orbit.".
+		//we need to raise our orbit, since the vector operations don't seem to function if the angles are greater than 90degrees.
+
+		print "First going to the PERIAPSIS".
+		set kuniverse:timewarp:mode to "RAILS".
+		until ETA:PERIAPSIS < 5 {
+			set kuniverse:timewarp:rate to ETA:PERIAPSIS.
+			wait 0.
+		}
+		kuniverse:timewarp:cancelwarp().
+
+		print "And raise the the APOAPSIS".
+
+		lock steering to PROGRADE.
+		wait 2.
+		set throttle to 1.
+		wait until APOAPSIS > targeAlt.
+		set throttle to 0.
+
+		print "Then going to the PERIAPSIS".
+		until ETA:APOAPSIS < 15 {
+			set kuniverse:timewarp:rate to ETA:APOAPSIS.
+			wait 0.
+		}
+		kuniverse:timewarp:cancelwarp().
+
+		print "And raise the the PERIAPSIS".
+		wait 2.
+		set throttle to 1.
+		wait until PERIAPSIS > targeAlt.
+		set throttle to 0.
+
+		print "Manuver complete.".
+		print " ".
+		print " ".
+		print " ".
+		print " ".
+		print " ".
+	}
+
   set AngleForIntersect to AngleForIntersection(OBT, TARGET:ORBIT).
   set DV1 to DELTAV1(OBT, TARGET:ORBIT).
 

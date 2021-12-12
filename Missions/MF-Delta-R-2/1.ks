@@ -45,7 +45,7 @@ if SHIP:STATUS = "ORBITING" and OBT:BODY:NAME = "Kerbin" {
 
   set TARGET to "Mun".
 
-	set targeAlt to 180000.
+	set targeAlt to 125000.
 
 	if OBT:PERIAPSIS < targeAlt {
 		print "We have to raise the Orbit.".
