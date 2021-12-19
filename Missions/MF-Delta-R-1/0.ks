@@ -2,6 +2,11 @@ SHIP:PARTSDUBBED("CX-4181 Scriptable Control System")[0]:GETMODULEBYINDEX(0):DOE
 set terminal:WIDTH to 50.
 set terminal:HEIGHT to 60.
 
+clearscreen.
+FROM {local x is 0.} UNTIL x = 11 STEP {set x to x+1.} DO {
+  print " ".
+}
+
 function distanceAccel {
 	parameter s0, v0, accel, t.
 	return s0 + v0*t + 0.5*accel*t*t.
@@ -97,21 +102,21 @@ function NewtonSolver {
 		set a0 to v_accel_func(v0).
 		set jerk to v_jerk_func(a0).
 
-		print "p0: " + p0 at (0,22).
-		print "s0: " + s0 at (0,23).
-		print "v0: " + v0 at (0,24).
-		print "a0: " + a0 at (0,25).
-		print "jerk: " + jerk at (0,26).
+		print "p0: " + p0 at (0,2).
+		print "s0: " + s0 at (0,3).
+		print "v0: " + v0 at (0,4).
+		print "a0: " + a0 at (0,5).
+		print "jerk: " + jerk at (0,6).
 
 		until counter >= maxN {
 				set p to p0 - distanceJerk(s0, v0, a0, jerk, p0) / distanceJerkDerivative (v0, a0, jerk, p0).
-				print "f(p0): " + distanceJerk(s0, v0, a0, jerk, p0) at (0,27).
-				print "f'(p0): " + distanceJerkDerivative(v0, a0, jerk, p0) at (0,28).
+				print "f(p0): " + distanceJerk(s0, v0, a0, jerk, p0) at (0,7).
+				print "f'(p0): " + distanceJerkDerivative(v0, a0, jerk, p0) at (0,8).
 
 
 				if abs(p - p0) < tolerance {
 					set previousTime to p.
-					print "Found in: " + counter + " steps" at (0,29).
+					print "Found in: " + counter + " steps" at (0,9).
 					return p.
 				}
 				set counter to counter + 1.
@@ -157,9 +162,6 @@ function DeltaVForCirc{
 
 	return vper - vap.
 }
-
-
-clearscreen.
 
 if SHIP:STATUS = "PRELAUNCH" {
 	LOCK THROTTLE TO 1.0.
@@ -214,8 +216,8 @@ if SHIP:STATUS = "FLYING" {
 		//acceleration and jerk will be derived.
 		set timeToTarget to SolveForTime(solver).
 		set pitch_ang to newPitch:call(timeToTarget).
-		print "Time to target: " + timeToTarget at (0,20).
-		print "Pitch Angle: " + pitch_ang at (0,21).
+		print "Time to target: " + timeToTarget at (0,0).
+		print "Pitch Angle: " + pitch_ang at (0,1).
 
 		// set throttle to throttleController:CALL().
 		// print "ETA:APOAPSIS: " + ETA:APOAPSIS at (0,31).
@@ -238,6 +240,9 @@ if SHIP:STATUS = "FLYING" {
 if SHIP:STATUS = "SUB_ORBITAL" {
 	//Do circularization
 	clearscreen.
+	FROM {local x is 0.} UNTIL x = 7 STEP {set x to x+1.} DO {
+	  print " ".
+	}
 	Print "Starting circularization".
 
 	when STAGE:DELTAV:CURRENT < 0.2 then{
@@ -282,7 +287,9 @@ if SHIP:STATUS = "SUB_ORBITAL" {
 	set APChase:SETPOINT to LengthOfBurn/2.
 	set initialAP to OBT:APOAPSIS.
 	set mythrot to 0.
+	set startTime to time:seconds.
 	lock throttle to mythrot.
+
 	until abs(initialAP - OBT:PERIAPSIS) < 100 or //this is the main target.
 				OBT:PERIAPSIS > initialAP or //we have pass initial point.
 				OBT:ECCENTRICITY < 0.001 or //this is the best case
@@ -292,14 +299,19 @@ if SHIP:STATUS = "SUB_ORBITAL" {
 
 		if SHIP:MAXTHRUST > 0 and OBT:PERIAPSIS < 50000 and DeltaVForCirc() / (SHIP:MAXTHRUST * 2) > 10 {
 			set APChase:SETPOINT to DeltaVForCirc() / (SHIP:MAXTHRUST * 2).
-			print "Chase Point: " + APChase:SETPOINT at (0,3).
 		}
 
 		if OBT:PERIAPSIS > 50000 {set APChase:SETPOINT to 10.}
+
+		print "Chase Point: " + APChase:SETPOINT at (0,1).
+		print "ETA:APOAPSIS: " + ETA:APOAPSIS at (0,2).
+		print " " at (0,3).
+		print "APOAPSIS: " + APOAPSIS at (0,4).
+		print "PERIAPSIS: " + PERIAPSIS at (0,5).
 	}
 	unlock throttle.
 
-	set startTime to time:seconds.
+
 	// set isAtMinEllipse to false.
 	// set curEllipseVal to OBT:ECCENTRICITY.
 

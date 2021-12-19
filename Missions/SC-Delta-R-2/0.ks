@@ -79,5 +79,35 @@ print "Geiger is done: " + SHIP:PARTSDUBBED("Geiger Counter")[0]:GETMODULE("Expe
 print "Mystery Goo is done: " + SHIP:PARTSDUBBED("Mystery Goo™ Containment Unit")[0]:GETMODULE("Experiment"):ALLEVENTNAMES[1]:Contains("t-none").
 
 
+local MysteryGoo is 0.
+local GeigerCounter is 0.
+local Thermometer is 0.
+
+set ShipParts to SHIP:PARTS.
+for Part in ShipParts{
+  // print "Part: " + Part:TITLE.
+  if Part:TITLE:Contains("Mystery Goo"){
+    set MysteryGoo to Part.
+  }
+  if Part:TITLE:Contains("Geiger Counter"){
+    set GeigerCounter to Part.
+  }
+  if Part:TITLE:Contains("Thermometer"){
+    set Thermometer to Part.
+  }
+}
+
+print "Start Geiger Counter".
+GeigerCounter[0]:GETMODULE("Experiment"):DOEVENT("<b>radiation scan</b>: <color=#ffd200>stopped</color>").
+print "Start Mystery Goo".
+MysteryGoo:GETMODULE("Experiment"):DOEVENT("<b>mystery goo™ observation</b>: <color=#ffd200>stopped</color>").
+print "Start Thermometer".
+Thermometer[0]:GETMODULE("Experiment"):DOEVENT("<b>temperature scan</b>: <color=#ffd200>stopped</color>").
+
+
+// Sometimes this technique is needed:
+
+
+
 
 wait until 1=0.
