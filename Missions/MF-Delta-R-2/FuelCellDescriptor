@@ -1,0 +1,111 @@
+Part: Fuel Cell
+  Num of Modules: 9
+  Module: ModuleCargoPart
+  Module: Refunding
+  Module: TweakScale
+  Module: HotSpotModule
+   Fields: 
+    Field: (settable) temp [i], is String
+    Field: (settable) temp [s], is String
+    Field: (settable) thermal rate, is String
+    Field: (settable) thermal rate [i], is String
+    Field: (settable) thermal rate [cd], is String
+    Field: (settable) thermal rate [cv], is String
+    Field: (settable) thermal rate [r], is String
+    Field: (settable) thermal rate [s-i], is String
+    Field: (settable) thermal rate [i-s], is String
+  Module: ProcessController
+   Event Names:
+    Event Name: (callable) <b>h2+o2 fuel cell</b>: stopped, is KSPEvent
+    Event Name: (callable) <b>dump</b>: water, is KSPEvent
+   Actions:
+    Action: (callable) start/stop h2+o2 fuel cell, is KSPAction
+  Module: ProcessController
+   Event Names:
+    Event Name: (callable) <b>monoprop+o2 fuel cell</b>: stopped, is KSPEvent
+    Event Name: (callable) <b>dump</b>: none, is KSPEvent
+   Actions:
+    Action: (callable) start/stop monoprop+o2 fuel cell, is KSPAction
+  Module: Configure
+  Module: Reliability
+   Fields: 
+    Field: (settable) fuel cell, is String
+  Module: KOSNameTag
+   Fields: 
+    Field: (settable) name tag, is String
+   Event Names:
+    Event Name: (callable) change name tag, is KSPEvent
+Part: Fuel Cell
+  Num of Modules: 9
+  Module: ModuleCargoPart
+  Module: Refunding
+  Module: TweakScale
+  Module: HotSpotModule
+   Fields: 
+    Field: (settable) temp [i], is String
+    Field: (settable) temp [s], is String
+    Field: (settable) thermal rate, is String
+    Field: (settable) thermal rate [i], is String
+    Field: (settable) thermal rate [cd], is String
+    Field: (settable) thermal rate [cv], is String
+    Field: (settable) thermal rate [r], is String
+    Field: (settable) thermal rate [s-i], is String
+    Field: (settable) thermal rate [i-s], is String
+  Module: ProcessController
+   Event Names:
+    Event Name: (callable) <b>h2+o2 fuel cell</b>: stopped, is KSPEvent
+    Event Name: (callable) <b>dump</b>: water, is KSPEvent
+   Actions:
+    Action: (callable) start/stop h2+o2 fuel cell, is KSPAction
+  Module: ProcessController
+   Event Names:
+    Event Name: (callable) <b>monoprop+o2 fuel cell</b>: stopped, is KSPEvent
+    Event Name: (callable) <b>dump</b>: none, is KSPEvent
+   Actions:
+    Action: (callable) start/stop monoprop+o2 fuel cell, is KSPAction
+  Module: Configure
+  Module: Reliability
+   Fields: 
+    Field: (settable) fuel cell, is String
+  Module: KOSNameTag
+   Fields: 
+    Field: (settable) name tag, is String
+   Event Names:
+    Event Name: (callable) change name tag, is KSPEvent
+Part: Fuel Cell
+  Num of Modules: 9
+  Module: ModuleCargoPart
+  Module: Refunding
+  Module: TweakScale
+  Module: HotSpotModule
+   Fields: 
+    Field: (settable) temp [i], is String
+    Field: (settable) temp [s], is String
+    Field: (settable) thermal rate, is String
+    Field: (settable) thermal rate [i], is String
+    Field: (settable) thermal rate [cd], is String
+    Field: (settable) thermal rate [cv], is String
+    Field: (settable) thermal rate [r], is String
+    Field: (settable) thermal rate [s-i], is String
+    Field: (settable) thermal rate [i-s], is String
+  Module: ProcessController
+   Event Names:
+    Event Name: (callable) <b>h2+o2 fuel cell</b>: running, is KSPEvent
+    Event Name: (callable) <b>dump</b>: water, is KSPEvent
+   Actions:
+    Action: (callable) start/stop h2+o2 fuel cell, is KSPAction
+  Module: ProcessController
+   Event Names:
+    Event Name: (callable) <b>monoprop+o2 fuel cell</b>: stopped, is KSPEvent
+    Event Name: (callable) <b>dump</b>: none, is KSPEvent
+   Actions:
+    Action: (callable) start/stop monoprop+o2 fuel cell, is KSPAction
+  Module: Configure
+  Module: Reliability
+   Fields: 
+    Field: (settable) fuel cell, is String
+  Module: KOSNameTag
+   Fields: 
+    Field: (settable) name tag, is String
+   Event Names:
+    Event Name: (callable) change name tag, is KSPEvent
