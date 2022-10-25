@@ -49,3 +49,12 @@ What is happening in simple terms?
 
 
 
+
+
+TODO: check if we can execute files without an extension, such that we can maybe have a minification
+  system that drops the extension and that file is loaded instead.
+
+I have read the compile documentation some, and it seems that we really don't need a minification program/system, since
+we can compile the source into ksm files. We will lose some debug information along the way, but we may save alot of space.
+
+So we are going to add this compile code to the Boot_S_System.
