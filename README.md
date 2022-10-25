@@ -84,7 +84,7 @@ The last system build during this phase was Mun transition system
 1. We got it working to do a transition to Mun, but this system was not refined at all and still need alot of work.
 
 
-# Ship Computer System V3
+# Ship Computer System V3 (SCS3)
 
 The bootstrap.ks file is chosen during ship building and is the entry point for this system.
 
