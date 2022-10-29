@@ -38,6 +38,8 @@ Launches:
     Recoved K8752 funds, which is very nice.
 
 
-Now the test vehicle is ready, we can start upgrading the SCS from V2 to V3, although some of the changes have already started, such as renaming it.
+Now the test vehicle is ready, we can start upgrading the SCS from V2 to V3, although some of the changes have already started, such as renaming files.
 
-
+4. Lots of launchpad 'launches' during the development of SCS3.
+    No funds used.
+    SCS3 Created, and manually tested.

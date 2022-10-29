@@ -1,4 +1,5 @@
-SHIP:PARTSDUBBED("CX-4181 Scriptable Control System")[0]:GETMODULEBYINDEX(0):DOEVENT("open terminal").
+// SHIP:partstagged("Launch")[0]:GETMODULEBYINDEX(0):DOEVENT("open terminal").
+core:doevent("open terminal").
 set terminal:WIDTH to 50.
 set terminal:HEIGHT to 60.
 
