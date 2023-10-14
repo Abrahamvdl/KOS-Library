@@ -17,10 +17,22 @@ if SHIP:STATUS = "PRELAUNCH" {
 		WAIT 1.
 	}
 
-	PRINT "Launching now".
+	PRINT "Launching now".	
 	STAGE.
 
 	wait 0.5.
+
+	print " ". //line 8
+	print " ".
+	print " ".
+	print " ".
+	print " ".
+	print " ".
+	print " ".
+	print " ".
+	print " ". //line 16
+	print " ".
+	print " ".
 }
 
 if SHIP:STATUS = "FLYING" {
@@ -36,15 +48,15 @@ if SHIP:STATUS = "FLYING" {
 		set throttle to 1.				
 	}
 
-	// when ALTITUDE > 300 then{
-	// 	set kuniverse:timewarp:mode to "PHYSICS".
-	// 	set kuniverse:timewarp:rate to 2.
-	// }
+	when ALTITUDE > 300 then{
+		set kuniverse:timewarp:mode to "PHYSICS".
+		set kuniverse:timewarp:rate to 2.
+	}
 
-	// when ALTITUDE > 50000 then{
-	// 	set kuniverse:timewarp:mode to "PHYSICS".
-	// 	set kuniverse:timewarp:rate to 4.
-	// }
+	when ALTITUDE > 50000 then{
+		set kuniverse:timewarp:mode to "PHYSICS".
+		set kuniverse:timewarp:rate to 4.
+	}
 
 	set pitch_ang to 90.
 	lock steering to heading(90,pitch_ang).
@@ -54,7 +66,7 @@ if SHIP:STATUS = "FLYING" {
 	set maxN to 10. //should reach answer within 5 iterations.
 	set tolerance to 1. //we want to be accurate to within 1 second.
 
-	set newPitch to getNewPitchAngle(pitch_ang, initTime, 0).
+	set newPitch to getNewPitchAngle(pitch_ang, 0).
 	set solver to NewtonSolver(initTime, targetHeight, maxN, tolerance).
 	// set throttleController to ThrottleControl(5000, 60).
 
@@ -65,8 +77,8 @@ if SHIP:STATUS = "FLYING" {
 		//acceleration and jerk will be derived.
 		set timeToTarget to SolveForTime(solver).
 		set pitch_ang to newPitch:call(timeToTarget).
-		print "Time to target: " + timeToTarget at (0,20).
-		print "Pitch Angle: " + pitch_ang at (0,21).
+		print "Time to target: " + round(timeToTarget, 3) at (0, 10).
+		print "Pitch Angle: " + round(pitch_ang, 3) at (26, 10).
 
 		// set throttle to throttleController:CALL().
 		// print "ETA:APOAPSIS: " + ETA:APOAPSIS at (0,31).
