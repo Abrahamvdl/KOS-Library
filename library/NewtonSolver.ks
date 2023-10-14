@@ -16,7 +16,7 @@ function distanceJerkDerivative {
 }
 
 function getNewPitchAngle {
-	parameter init_curAngle, init_ttt, TargetAngle.
+	parameter init_curAngle, TargetAngle.
 
 	local tlast is time:seconds.
 	local currentAngle is init_curAngle.
@@ -46,8 +46,7 @@ function makeDerivator_N {
 	//N_Count is a weigth, saying I am weighing the old value N_Count times more than the new value,
 	//thus the higher the number the slower the value will change.
 	local tlast is time:seconds.
-	local der is 0.
-	local der_last to 0.
+	local der is 0.	
 	local inputLast is init_value.
 	if init_value:isType("Vector"){
 		set der to v(0,0,0).
@@ -95,21 +94,23 @@ function NewtonSolver {
 		set a0 to v_accel_func(v0).
 		set jerk to v_jerk_func(a0).
 
-		print "p0: " + p0 at (0,22).
-		print "s0: " + s0 at (0,23).
-		print "v0: " + v0 at (0,24).
-		print "a0: " + a0 at (0,25).
-		print "jerk: " + jerk at (0,26).
+		print "p0: " + round(p0,3) at (0,  12). 
+		print "s0: " + round(s0,3) at (14, 12). 
+		print "v0: " + round(v0,3) at (28, 12).
+		print "a0: " + round(a0,3) at (0,  13).
+		print "jerk: " + round(jerk,3) at (14,13).
 
 		until counter >= maxN {
-				set p to p0 - distanceJerk(s0, v0, a0, jerk, p0) / distanceJerkDerivative (v0, a0, jerk, p0).
-				print "f(p0): " + distanceJerk(s0, v0, a0, jerk, p0) at (0,27).
-				print "f'(p0): " + distanceJerkDerivative(v0, a0, jerk, p0) at (0,28).
+				set distJerk to distanceJerk(s0, v0, a0, jerk, p0).
+				set distJerkDer to distanceJerkDerivative (v0, a0, jerk, p0).
+				set p to p0 - distJerk / distJerkDer.
+				print "f(p0): " + round(distJerk, 3) at (0, 14).
+				print "f'(p0): " + round(distJerkDer, 3) at (14, 14).
 
 
 				if abs(p - p0) < tolerance {
 					set previousTime to p.
-					print "Found in: " + counter + " steps" at (0,29).
+					print "Found in: " + counter + " steps" at (0,15).
 					return p.
 				}
 				set counter to counter + 1.
@@ -117,7 +118,7 @@ function NewtonSolver {
 		}
 
 		//if we got here then the procedure actually failed, so we give a message and return p0
-		print "Unable to find solution at time: " + previousTime.
+		print "Unable to find solution at time: " + round(previousTime, 3) at (0,16).
 		return previousTime.
 	}.
 }
@@ -135,14 +136,17 @@ function InitialTIme {
 function ThrottleControl{
 	parameter minHeight, targetAP.
 
-	local throttleController to PIDLOOP(1,0.1,0.001,0.001,1,0).
+	local throttleController to PIDLOOP(1, 0.01, 0.01, 0.1, 1, 0).
+	local mintAlt is minHeight.
 	set throttleController:SETPOINT to targetAP.
 
 	return {
-		if ALTITUDE < minHeight and ETA:APOAPSIS < targetAP {
-			return 1.
-		}
+		// if ALTITUDE < mintAlt{ // and ETA:APOAPSIS < targetAP {
+		// 	print "A" at (20,20).
+		// 	return 1.			
+		// }
 
+		// print "B" at (20,20).
 		return throttleController:UPDATE(TIME:SECONDS, ETA:APOAPSIS).
 	}.
 }
